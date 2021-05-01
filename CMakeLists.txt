@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
-PROJECT(Tweat LANGUAGES C)
+PROJECT(Tweak LANGUAGES C)
 
-ADD_LIBRARY(Tweat.Core
+ADD_LIBRARY(Tweak.Core
         Source/actions.c
         Source/btree.c
         Source/buffer.c
@@ -11,10 +11,10 @@ ADD_LIBRARY(Tweat.Core
         Source/search.c
         Source/slang.c
         )
-TARGET_INCLUDE_DIRECTORIES(Tweat.Core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include/>)
+TARGET_INCLUDE_DIRECTORIES(Tweak.Core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include/>)
 
-ADD_EXECUTABLE(Tweat.App
+ADD_EXECUTABLE(Tweak.App
         Source/main.c
         )
 
-TARGET_LINK_LIBRARIES(Tweat.App PRIVATE Tweat.Core ncurses)
+TARGET_LINK_LIBRARIES(Tweak.App PRIVATE Tweak.Core ncurses)
