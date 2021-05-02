@@ -20,7 +20,7 @@ namespace Tweak
 
 		std::size_t front;
 
-		std::size_t near;
+		std::size_t rear;
 
 	public:
 
@@ -28,7 +28,7 @@ namespace Tweak
 		{
 			maxQue = 501;
 			front = maxQue - 1;
-			near = maxQue - 1;
+			rear = maxQue - 1;
 			items = new ItemType[maxQue];
 		}
 
@@ -36,7 +36,7 @@ namespace Tweak
 		{
 			maxQue = max + 1;
 			front = max - 1;
-			near = max - 1;
+			rear = max - 1;
 			items = new ItemType[maxQue];
 		}
 
@@ -48,17 +48,17 @@ namespace Tweak
 		void makeEmpty()
 		{
 			front = maxQue - 1;
-			near = maxQue - 1;
+			rear = maxQue - 1;
 		}
 
 		bool isEmpty() const
 		{
-			return (near == front);
+			return (rear == front);
 		}
 
 		bool isFull() const
 		{
-			return ((near + 1) % maxQue == front);
+			return ((rear + 1) % maxQue == front);
 		}
 
 		void enqueue(ItemType item)
@@ -69,8 +69,8 @@ namespace Tweak
 			}
 			else
 			{
-				near = (near + 1) % maxQue;
-				items[near] = item;
+				rear = (rear + 1) % maxQue;
+				items[rear] = item;
 			}
 		}
 
