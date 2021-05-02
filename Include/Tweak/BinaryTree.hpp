@@ -184,7 +184,7 @@ namespace Tweak
 			else
 			{
 				copy = new TreeNode<ItemType>();
-				copy->info = original.info;
+				copy->info = original->info;
 				copyTree(copy->left, original->left);
 				copyTree(copy->right, original->right);
 			}
