@@ -35,7 +35,7 @@ struct BufferBlock
 	unsigned char* data;           /* only used if fp==NULL */
 };
 
-static ItemType bufblkcopy(void* state, void* av)
+static ItemType BufferBlock_Copy(void* state, void* av)
 {
 	struct BufferBlock* a = (struct BufferBlock*)av;
 	struct BufferBlock* ret;
@@ -60,7 +60,7 @@ static ItemType bufblkcopy(void* state, void* av)
 	return ret;
 }
 
-static void bufblkfree(void* state, void* av)
+static void BufferBlock_Free(void* state, void* av)
 {
 	struct BufferBlock* a = (struct BufferBlock*)av;
 
@@ -107,7 +107,7 @@ static buffer* buf_new_from_bt(BinaryTree* bt)
 
 static BinaryTree* buf_bt_new(void)
 {
-	return bt_new(NULL, bufblkcopy, bufblkfree, sizeof(fileoffset_t),
+	return bt_new(NULL, BufferBlock_Copy, BufferBlock_Free, sizeof(fileoffset_t),
 			alignof(fileoffset_t), bufblkpropmake, bufblkpropmerge,
 			NULL, 2);
 }
@@ -220,14 +220,14 @@ static int buf_bt_cleanup(BinaryTree* bt, int index)
 	if (a && (cvt = buf_convert_to_literal(a)) != NULL)
 	{
 		bt_replace(bt, cvt, index);
-		bufblkfree(NULL, a);
+		BufferBlock_Free(NULL, a);
 		a = cvt;
 	}
 
 	if (b && (cvt = buf_convert_to_literal(b)) != NULL)
 	{
 		bt_replace(bt, cvt, index + 1);
-		bufblkfree(NULL, b);
+		BufferBlock_Free(NULL, b);
 		b = cvt;
 	}
 
@@ -298,7 +298,7 @@ static int buf_bt_splitpoint(BinaryTree* bt, fileoffset_t pos)
 	 * Now split element `index' at position `poswithin'.
 	 */
 	blk = (struct BufferBlock*)bt_index_w(bt, index);   /* ensure ref count == 1 */
-	newblk = (struct BufferBlock*)bufblkcopy(NULL, blk);
+	newblk = (struct BufferBlock*)BufferBlock_Copy(NULL, blk);
 
 	if (!newblk->file)
 	{
