@@ -61,6 +61,56 @@ namespace Tweak
 			}
 		}
 
+		void getPredecessor(TreeNode<ItemType>* tree, ItemType& data)
+		{
+			while (tree->right not_eq nullptr)
+			{
+				tree = tree->right;
+			}
+
+			data = tree->info;
+		}
+
+		void deleteNode(TreeNode<ItemType>*& tree)
+		{
+			ItemType data;
+			TreeNode<ItemType>* tempPtr;
+
+			tempPtr = tree;
+			if (tree->left == nullptr)
+			{
+				tree = tree->right;
+				delete tempPtr;
+			}
+			else if (tree->right == nullptr)
+			{
+				tree = tree->left;
+				delete tempPtr;
+			}
+			else
+			{
+				getPredecessor(tree->left, data);
+				tree->info = data;
+				deleteItem(tree->left, data);
+			}
+		}
+
+		void deleteItem(TreeNode<ItemType>*& tree, ItemType item)
+		{
+			if (item < item->info)
+			{
+				deleteItem(tree->left, item);
+			}
+			else if (item > tree->info)
+			{
+				deleteItem(tree->right, item);
+			}
+			else
+			{
+				deleteNode(tree);
+			}
+		}
+
 		/**
 		 * @return The number of nodes in the tree.
 		 */
@@ -131,7 +181,10 @@ namespace Tweak
 			insert(root, item);
 		}
 
-		void deleteItem(ItemType value);
+		void deleteItem(ItemType item)
+		{
+			deleteItem(root, item);
+		}
 
 		void resetTree(OrderType order);
 
