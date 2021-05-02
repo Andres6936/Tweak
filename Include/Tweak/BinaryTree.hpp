@@ -275,6 +275,14 @@ namespace Tweak
 			}
 		}
 
+		/**
+		 * Adds item to tree.
+		 *
+		 * @pre Tree is not full. Item is not in tree.
+		 * @post Item in the tree. Binary search property is maintained.
+		 *
+		 * @param item
+		 */
 		void insertItem(ItemType item)
 		{
 			insert(root, item);
