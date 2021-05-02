@@ -21,6 +21,46 @@ namespace Tweak
 
 	private:
 
+		void insert(TreeNode<ItemType>*& tree, ItemType item)
+		{
+			if (tree == nullptr)
+			{
+				tree = new TreeNode<ItemType>();
+				tree->right = nullptr;
+				tree->left = nullptr;
+				tree->info = item;
+			}
+			else if (item < item->info)
+			{
+				insert(tree->left, item);
+			}
+			else
+			{
+				insert(tree->right, item);
+			}
+		}
+
+		void retrieve(TreeNode<ItemType>* tree, ItemType& item, bool& found)
+		{
+			if (tree == nullptr)
+			{
+				found = false;
+			}
+			else if (item < tree->info)
+			{
+
+			}
+			else if (item > tree->info)
+			{
+
+			}
+			else
+			{
+				item = tree->info;
+				found = true;
+			}
+		}
+
 		/**
 		 * @return The number of nodes in the tree.
 		 */
@@ -86,7 +126,10 @@ namespace Tweak
 			}
 		}
 
-		void insertItem(ItemType value);
+		void insertItem(ItemType item)
+		{
+			insert(root, item);
+		}
 
 		void deleteItem(ItemType value);
 
@@ -94,7 +137,10 @@ namespace Tweak
 
 		void print(std::ofstream& outFile) const;
 
-		void retrieveItem(ItemType& item, bool& found) const;
+		void retrieveItem(ItemType& item, bool& found) const
+		{
+			retrieve(root, item, found);
+		}
 
 		void getNextItem(ItemType& item, OrderType order, bool& finished);
 
