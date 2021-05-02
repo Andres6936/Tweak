@@ -35,7 +35,7 @@ struct bufblk
 	unsigned char* data;           /* only used if fp==NULL */
 };
 
-static bt_element_t bufblkcopy(void* state, void* av)
+static ItemType bufblkcopy(void* state, void* av)
 {
 	struct bufblk* a = (struct bufblk*)av;
 	struct bufblk* ret;
@@ -78,7 +78,7 @@ static void bufblkfree(void* state, void* av)
 	free(a);
 }
 
-void bufblkpropmake(void* state, bt_element_t av, void* destv)
+void bufblkpropmake(void* state, ItemType av, void* destv)
 {
 	struct bufblk* a = (struct bufblk*)av;
 	fileoffset_t* dest = (fileoffset_t*)destv;
@@ -120,7 +120,7 @@ extern void buf_free(buffer* buf)
 
 static int bufblksearch(void* tstate, void* sstate, int ntrees,
 		void** props, int* counts,
-		bt_element_t* elts, int* is_elt)
+		ItemType* elts, int* is_elt)
 {
 	fileoffset_t* disttogo = (fileoffset_t*)sstate;
 	fileoffset_t distsofar = 0;
@@ -346,7 +346,7 @@ static void buf_insert_bt(buffer* buf, btree* bt, fileoffset_t pos)
 
 static int bufblklensearch(void* tstate, void* sstate, int ntrees,
 		void** props, int* counts,
-		bt_element_t* elts, int* is_elt)
+		ItemType* elts, int* is_elt)
 {
 	fileoffset_t* output = (fileoffset_t*)sstate;
 	fileoffset_t size = 0;

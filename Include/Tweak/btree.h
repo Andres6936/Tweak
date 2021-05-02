@@ -37,22 +37,22 @@
 #endif
 
 typedef struct btree btree;
-typedef void* bt_element_t;
+typedef void* ItemType;
 
-typedef int (* cmpfn_t)(void* state, bt_element_t, bt_element_t);
+typedef int (* cmpfn_t)(void* state, ItemType, ItemType);
 
-typedef bt_element_t (* copyfn_t)(void* state, bt_element_t);
+typedef ItemType (* copyfn_t)(void* state, ItemType);
 
-typedef void (* freefn_t)(void* state, bt_element_t);
+typedef void (* freefn_t)(void* state, ItemType);
 
-typedef void (* propmakefn_t)(void* state, bt_element_t, void* dest);
+typedef void (* propmakefn_t)(void* state, ItemType, void* dest);
 
 /* s1 may be NULL (indicating copy s2 into dest). s2 is never NULL. */
 typedef void (* propmergefn_t)(void* state, void* s1, void* s2, void* dest);
 
 typedef int (* searchfn_t)(void* tstate, void* sstate, int ntrees,
 		void** props, int* counts,
-		bt_element_t* elts, int* is_elt);
+		ItemType* elts, int* is_elt);
 
 enum
 {
@@ -69,33 +69,33 @@ btree* bt_clone(btree* bt);
 
 int bt_count(btree* bt);
 
-bt_element_t bt_index(btree* bt, int index);
+ItemType bt_index(btree* bt, int index);
 
-bt_element_t bt_index_w(btree* bt, int index);
+ItemType bt_index_w(btree* bt, int index);
 
-bt_element_t bt_findrelpos(btree* bt, bt_element_t element, cmpfn_t cmp,
+ItemType bt_findrelpos(btree* bt, ItemType element, cmpfn_t cmp,
 		int relation, int* index);
 
-bt_element_t bt_findrel(btree* bt, bt_element_t element, cmpfn_t cmp,
+ItemType bt_findrel(btree* bt, ItemType element, cmpfn_t cmp,
 		int relation);
 
-bt_element_t bt_findpos(btree* bt, bt_element_t element, cmpfn_t cmp,
+ItemType bt_findpos(btree* bt, ItemType element, cmpfn_t cmp,
 		int* index);
 
-bt_element_t bt_find(btree* bt, bt_element_t element, cmpfn_t cmp);
+ItemType bt_find(btree* bt, ItemType element, cmpfn_t cmp);
 
-bt_element_t bt_propfind(btree* bt, searchfn_t search, void* sstate,
+ItemType bt_propfind(btree* bt, searchfn_t search, void* sstate,
 		int* index);
 
-bt_element_t bt_replace(btree* bt, bt_element_t element, int index);
+ItemType bt_replace(btree* bt, ItemType element, int index);
 
-void bt_addpos(btree* bt, bt_element_t element, int pos);
+void bt_addpos(btree* bt, ItemType element, int pos);
 
-bt_element_t bt_add(btree* bt, bt_element_t element);
+ItemType bt_add(btree* bt, ItemType element);
 
-bt_element_t bt_delpos(btree* bt, int pos);
+ItemType bt_delpos(btree* bt, int pos);
 
-bt_element_t bt_del(btree* bt, bt_element_t element);
+ItemType bt_del(btree* bt, ItemType element);
 
 btree* bt_join(btree* bt1, btree* bt2);
 
@@ -103,6 +103,6 @@ btree* bt_joinr(btree* bt1, btree* bt2);
 
 btree* bt_splitpos(btree* bt, int index, int before);
 
-btree* bt_split(btree* bt, bt_element_t element, cmpfn_t cmp, int rel);
+btree* bt_split(btree* bt, ItemType element, cmpfn_t cmp, int rel);
 
 #endif /* BTREE_H */

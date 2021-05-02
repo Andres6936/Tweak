@@ -98,14 +98,14 @@ typedef struct
  * distinct types of thing: nodes, elements, some counters, some
  * user-defined properties ... it's a horrible thing. So we define
  * it as an array of unions, each union being either an `int' or a
- * `bt_element_t' or a `node_addr'...
+ * `ItemType' or a `node_addr'...
  */
 
 union nodecomponent
 {
 	int i;
 	node_addr na;
-	bt_element_t ep;
+	ItemType ep;
 };
 
 static const node_addr NODE_ADDR_NULL = { NULL };
@@ -208,13 +208,13 @@ static INLINE void bt_set_child(btree* bt, nodeptr n,
 /*
  * Read and write the address of an element.
  */
-static INLINE bt_element_t bt_element(btree* bt, nodeptr n, int index)
+static INLINE ItemType bt_element(btree* bt, nodeptr n, int index)
 {
 	return n[bt->maxdegree + index].ep;
 }
 
 static INLINE void bt_set_element(btree* bt, nodeptr n,
-		int index, bt_element_t value)
+		int index, ItemType value)
 {
 	n[bt->maxdegree + index].ep = value;
 }
@@ -367,7 +367,7 @@ static nodeptr bt_clone_node(btree* bt, nodeptr n)
 	{
 		for (i = 0; i < bt_elements(bt, ret); i++)
 		{
-			bt_element_t* e = bt_element(bt, ret, i);
+			ItemType* e = bt_element(bt, ret, i);
 			bt_set_element(bt, ret, i, bt->copy(bt->userstate, e));
 		}
 	}
@@ -549,7 +549,7 @@ static int bt_child_startpos(btree* bt, nodeptr n, int index)
  * Create a new root node for a tree.
  */
 static void bt_new_root(btree* bt, node_addr left, node_addr right,
-		bt_element_t element)
+		ItemType element)
 {
 	nodeptr n;
 	n = bt_new_node(bt, 2);
@@ -626,7 +626,7 @@ static int bt_lookup_pos(btree* bt, nodeptr n, int* pos, int* ends)
  * Since this may be used by bt_find() with an alternative cmpfn_t,
  * we always pass the input element as the first argument to cmp.
  */
-static int bt_lookup_cmp(btree* bt, nodeptr n, bt_element_t element,
+static int bt_lookup_cmp(btree* bt, nodeptr n, ItemType element,
 		cmpfn_t cmp, int* is_elt)
 {
 	int mintree = 0, maxtree = bt_subtrees(bt, n) - 1;
@@ -714,18 +714,18 @@ static int bt_lookup_cmp(btree* bt, nodeptr n, bt_element_t element,
 #define NODE_JOIN -1
 
 static void bt_xform(btree* bt, int intype, int inaux,
-		nodeptr in1, nodeptr in2, bt_element_t inelt,
+		nodeptr in1, nodeptr in2, ItemType inelt,
 		node_addr extra1, node_addr extra2,
 		int splitpos, nodeptr* out1, nodeptr* out2,
-		bt_element_t* outelt)
+		ItemType* outelt)
 {
 	node_addr* nodes;
-	bt_element_t* elements;
+	ItemType* elements;
 	nodeptr ret1, ret2;
 	int n1, n2, off2, i, j;
 
 	nodes = inewn(node_addr, 2 * bt_max_subtrees(bt));
-	elements = inewn(bt_element_t, 2 * bt_max_subtrees(bt));
+	elements = inewn(ItemType, 2 * bt_max_subtrees(bt));
 
 	/*
 	 * Accumulate the input list.
@@ -848,13 +848,13 @@ static void bt_xform(btree* bt, int intype, int inaux,
  * returns -1 (a < b).
  */
 static int bt_cmp_greater(void* state,
-		const bt_element_t a, const bt_element_t b)
+		const ItemType a, const ItemType b)
 {
 	return +1;
 }
 
 static int bt_cmp_less(void* state,
-		const bt_element_t a, const bt_element_t b)
+		const ItemType a, const ItemType b)
 {
 	return -1;
 }
@@ -974,7 +974,7 @@ int bt_count(btree* bt)
  * this if you were using tree cloning, and wanted to modify the
  * element once you'd found it.)
  */
-bt_element_t bt_index(btree* bt, int index)
+ItemType bt_index(btree* bt, int index)
 {
 	nodeptr n, n2;
 	int child, ends;
@@ -992,7 +992,7 @@ bt_element_t bt_index(btree* bt, int index)
 		child = bt_lookup_pos(bt, n, &index, &ends);
 		if (ends & ENDS_RIGHT)
 		{
-			bt_element_t ret = bt_element(bt, n, child);
+			ItemType ret = bt_element(bt, n, child);
 			bt_read_unlock(bt, n);
 			return ret;
 		}
@@ -1003,12 +1003,12 @@ bt_element_t bt_index(btree* bt, int index)
 	}
 }
 
-bt_element_t bt_index_w(btree* bt, int index)
+ItemType bt_index_w(btree* bt, int index)
 {
 	nodeptr n, n2;
 	int nnodes, child, ends;
 	nodeptr* nodes;
-	bt_element_t ret;
+	ItemType ret;
 
 	nodes = inewn(nodeptr, bt->depth + 1);
 	nnodes = 0;
@@ -1044,12 +1044,12 @@ bt_element_t bt_index_w(btree* bt, int index)
 /*
  * Search for an element by sorted order.
  */
-bt_element_t bt_findrelpos(btree* bt, bt_element_t element, cmpfn_t cmp,
+ItemType bt_findrelpos(btree* bt, ItemType element, cmpfn_t cmp,
 		int relation, int* index)
 {
 	nodeptr n, n2;
 	int child, is_elt;
-	bt_element_t gotit;
+	ItemType gotit;
 	int pos = 0;
 
 	if (!cmp) cmp = bt->cmp;
@@ -1127,19 +1127,19 @@ bt_element_t bt_findrelpos(btree* bt, bt_element_t element, cmpfn_t cmp,
 	return gotit;
 }
 
-bt_element_t bt_findrel(btree* bt, bt_element_t element, cmpfn_t cmp,
+ItemType bt_findrel(btree* bt, ItemType element, cmpfn_t cmp,
 		int relation)
 {
 	return bt_findrelpos(bt, element, cmp, relation, NULL);
 }
 
-bt_element_t bt_findpos(btree* bt, bt_element_t element, cmpfn_t cmp,
+ItemType bt_findpos(btree* bt, ItemType element, cmpfn_t cmp,
 		int* index)
 {
 	return bt_findrelpos(bt, element, cmp, BT_REL_EQ, index);
 }
 
-bt_element_t bt_find(btree* bt, bt_element_t element, cmpfn_t cmp)
+ItemType bt_find(btree* bt, ItemType element, cmpfn_t cmp)
 {
 	return bt_findrelpos(bt, element, cmp, BT_REL_EQ, NULL);
 }
@@ -1152,19 +1152,19 @@ bt_element_t bt_find(btree* bt, bt_element_t element, cmpfn_t cmp)
  * index of either the element or the gap in `*index' if `index' is
  * non-NULL.
  */
-bt_element_t bt_propfind(btree* bt, searchfn_t search, void* sstate,
+ItemType bt_propfind(btree* bt, searchfn_t search, void* sstate,
 		int* index)
 {
 	nodeptr n, n2;
 	int i, j, count, is_elt;
 	void** props;
 	int* counts;
-	bt_element_t* elts;
-	bt_element_t* e = NULL;
+	ItemType* elts;
+	ItemType* e = NULL;
 
 	props = inewn(void *, bt->maxdegree);
 	counts = inewn(int, bt->maxdegree);
-	elts = inewn(bt_element_t, bt->maxdegree);
+	elts = inewn(ItemType, bt->maxdegree);
 
 	n = bt_read_lock_root(bt);
 
@@ -1236,11 +1236,11 @@ bt_element_t bt_propfind(btree* bt, searchfn_t search, void* sstate,
  * element, but has changed in some way that will affect user
  * properties.
  */
-bt_element_t bt_replace(btree* bt, bt_element_t element, int index)
+ItemType bt_replace(btree* bt, ItemType element, int index)
 {
 	nodeptr n;
 	nodeptr* nodes;
-	bt_element_t ret;
+	ItemType ret;
 	int nnodes, child, ends;
 
 	nodes = inewn(nodeptr, bt->depth + 1);
@@ -1279,7 +1279,7 @@ bt_element_t bt_replace(btree* bt, bt_element_t element, int index)
  * write-lock every node we meet, since otherwise we might fail to
  * clone nodes that will end up pointing to different things.
  */
-void bt_addpos(btree* bt, bt_element_t element, int pos)
+void bt_addpos(btree* bt, ItemType element, int pos)
 {
 	nodeptr n;
 	node_addr left, right, single;
@@ -1381,7 +1381,7 @@ void bt_addpos(btree* bt, bt_element_t element, int pos)
  * known that the item _can_ be added to the tree (and isn't
  * duplicated in it already).
  */
-bt_element_t bt_add(btree* bt, bt_element_t element)
+ItemType bt_add(btree* bt, ItemType element)
 {
 	nodeptr n, n2;
 	int child, is_elt;
@@ -1412,12 +1412,12 @@ bt_element_t bt_add(btree* bt, bt_element_t element)
  * Delete an element given its numeric position. Returns the
  * element deleted.
  */
-bt_element_t bt_delpos(btree* bt, int pos)
+ItemType bt_delpos(btree* bt, int pos)
 {
 	nodeptr n, c, c2, saved_n;
 	nodeptr* nodes;
 	int nnodes, child, nroot, pos2, ends, st, splitpoint, saved_pos;
-	bt_element_t e, ret;
+	ItemType e, ret;
 
 	/*
 	 * Just like in bt_add, we store the set of nodeptrs we
@@ -1618,7 +1618,7 @@ bt_element_t bt_delpos(btree* bt, int pos)
 /*
  * Delete an element in sorted order.
  */
-bt_element_t bt_del(btree* bt, bt_element_t element)
+ItemType bt_del(btree* bt, ItemType element)
 {
 	int index;
 	if (!bt_findrelpos(bt, element, NULL, BT_REL_EQ, &index))
@@ -1637,7 +1637,7 @@ bt_element_t bt_del(btree* bt, bt_element_t element)
  * their children are yet write-locked.
  */
 static void bt_join_internal(btree* bt, nodeptr lp, nodeptr rp,
-		bt_element_t sep, int ld, int rd)
+		ItemType sep, int ld, int rd)
 {
 	nodeptr* nodes;
 	int* childposns;
@@ -1801,7 +1801,7 @@ btree* bt_join(btree* bt1, btree* bt2)
 	size2 = bt_count(bt2);
 	if (size2 > 0)
 	{
-		bt_element_t sep;
+		ItemType sep;
 
 		if (bt1->cmp)
 		{
@@ -1834,7 +1834,7 @@ btree* bt_joinr(btree* bt1, btree* bt2)
 	size1 = bt_count(bt1);
 	if (size1 > 0)
 	{
-		bt_element_t sep;
+		ItemType sep;
 
 		if (bt2->cmp)
 		{
@@ -1894,7 +1894,7 @@ static void bt_split_heal(btree* bt, int rhs)
 	{
 		int edge, next, elt, size_e, size_n, size_total;
 		nodeptr ne, nn, nl, nr;
-		bt_element_t el;
+		ItemType el;
 
 		nodes[nnodes++] = n;
 
@@ -2081,7 +2081,7 @@ btree* bt_splitpos(btree* bt, int index, int before)
 /*
  * Split a tree at a position dictated by the sorting order.
  */
-btree* bt_split(btree* bt, bt_element_t element, cmpfn_t cmp, int rel)
+btree* bt_split(btree* bt, ItemType element, cmpfn_t cmp, int rel)
 {
 	int before, index;
 
@@ -2165,7 +2165,7 @@ static nodeptr bt_copy_node(btree *bt, nodeptr n)
 	bt_read_unlock(bt, n2);
 
 	if (i < children-1) {
-		bt_element_t e = bt_element(bt, n, i);
+		ItemType e = bt_element(bt, n, i);
 		if (bt->copy)
 		e = bt->copy(bt->userstate, e);
 		bt_set_element(bt, ret, i, e);
@@ -2232,7 +2232,7 @@ void bt_dump_nodes(btree *bt, ...)
  *    assuming the array is correctly constructed.)
  */
 
-void verifynode(btree *bt, nodeptr n, bt_element_t *array, int *arraypos,
+void verifynode(btree *bt, nodeptr n, ItemType *array, int *arraypos,
 		int depth)
 {
 	int subtrees, min, max, i, before, after, count;
@@ -2257,7 +2257,7 @@ void verifynode(btree *bt, nodeptr n, bt_element_t *array, int *arraypos,
 
 	/* Check that elements are all present. */
 	for (i = 0; i < subtrees-1; i++) {
-	bt_element_t elt = bt_element(bt, n, i);
+	ItemType elt = bt_element(bt, n, i);
 	if (elt == NULL)
 		error("node %p element %d is NULL\n", n, i);
 	}
@@ -2272,7 +2272,7 @@ void verifynode(btree *bt, nodeptr n, bt_element_t *array, int *arraypos,
 		bt_read_unlock(bt, child);
 	}
 	if (i < subtrees-1) {
-		bt_element_t elt = bt_element(bt, n, i);
+		ItemType elt = bt_element(bt, n, i);
 		if (array[*arraypos] != elt) {
 		error("node %p element %d is \"%s\", but array[%d]=\"%s\"",
 			  n, i, elt, *arraypos, array[*arraypos]);
@@ -2314,7 +2314,7 @@ void verifynode(btree *bt, nodeptr n, bt_element_t *array, int *arraypos,
 	}
 }
 
-void verifytree(btree *bt, bt_element_t *array, int arraylen)
+void verifytree(btree *bt, ItemType *array, int arraylen)
 {
 	nodeptr n;
 	int i = 0;
@@ -2368,9 +2368,9 @@ void mypropmerge(void *state, void *s1v, void *s2v, void *destv)
 	dest[1] = (s1 && s1[1] > s2[1] ? s1[1] : s2[1]);
 }
 
-void array_addpos(bt_element_t *array, int *arraylen, bt_element_t e, int i)
+void array_addpos(ItemType *array, int *arraylen, ItemType e, int i)
 {
-	bt_element_t e2;
+	ItemType e2;
 	int len = *arraylen;
 
 	assert(len < MAXTREESIZE);
@@ -2385,7 +2385,7 @@ void array_addpos(bt_element_t *array, int *arraylen, bt_element_t e, int i)
 	*arraylen = len+1;
 }
 
-void array_add(bt_element_t *array, int *arraylen, bt_element_t e)
+void array_add(ItemType *array, int *arraylen, ItemType e)
 {
 	int i;
 	int len = *arraylen;
@@ -2397,7 +2397,7 @@ void array_add(bt_element_t *array, int *arraylen, bt_element_t e)
 	array_addpos(array, arraylen, e, i);
 }
 
-void array_delpos(bt_element_t *array, int *arraylen, int i)
+void array_delpos(ItemType *array, int *arraylen, int i)
 {
 	int len = *arraylen;
 
@@ -2408,11 +2408,11 @@ void array_delpos(bt_element_t *array, int *arraylen, int i)
 	*arraylen = len-1;
 }
 
-bt_element_t array_del(bt_element_t *array, int *arraylen, bt_element_t e)
+ItemType array_del(ItemType *array, int *arraylen, ItemType e)
 {
 	int i;
 	int len = *arraylen;
-	bt_element_t ret;
+	ItemType ret;
 
 	for (i = 0; i < len; i++)
 	if (mycmp(NULL, array[i], e) >= 0)
@@ -2451,7 +2451,7 @@ char *strings[] = {
 
 #define NSTR lenof(strings)
 
-void findtest(btree *tree, bt_element_t *array, int arraylen)
+void findtest(btree *tree, ItemType *array, int arraylen)
 {
 	static const int rels[] = {
 	BT_REL_EQ, BT_REL_GE, BT_REL_LE, BT_REL_LT, BT_REL_GT
@@ -2540,7 +2540,7 @@ void findtest(btree *tree, bt_element_t *array, int arraylen)
 	}
 }
 
-void splittest(btree *tree, bt_element_t *array, int arraylen)
+void splittest(btree *tree, ItemType *array, int arraylen)
 {
 	int i;
 	btree *tree3, *tree4;
@@ -2633,9 +2633,9 @@ int main(void) {
 	int i, j, k;
 	int tworoot, tmplen;
 	unsigned seed = 0;
-	bt_element_t *array;
+	ItemType *array;
 	int arraylen;
-	bt_element_t ret, ret2, item;
+	ItemType ret, ret2, item;
 	btree *tree, *tree2, *tree3, *tree4;
 
 	setvbuf(stdout, NULL, _IOLBF, 0);
@@ -2643,7 +2643,7 @@ int main(void) {
 	errors = 0;
 
 	for (i = 0; i < (int)NSTR; i++) in[i] = 0;
-	array = newn(bt_element_t, MAXTREESIZE);
+	array = newn(ItemType, MAXTREESIZE);
 	arraylen = 0;
 	tree = bt_new(mycmp, NULL, NULL, 2*sizeof(int), alignof(int),
 		  mypropmake, mypropmerge, NULL, TEST_DEGREE);
@@ -2658,7 +2658,7 @@ int main(void) {
 		ret2 = array_del(array, &arraylen, strings[j]);
 		ret = bt_del(tree, strings[j]);
 		testlock(-1, 0, NULL);
-		assert((bt_element_t)strings[j] == ret && ret == ret2);
+		assert((ItemType)strings[j] == ret && ret == ret2);
 		verifytree(tree, array, arraylen);
 		in[j] = 0;
 		} else {
@@ -2751,7 +2751,7 @@ int main(void) {
 	printf("deleting string %s from index %d\n", (char *)array[j], j);
 	ret = bt_delpos(tree, j);
 	testlock(-1, 0, NULL);
-	assert((bt_element_t)array[j] == ret);
+	assert((ItemType)array[j] == ret);
 	array_delpos(array, &arraylen, j);
 	verifytree(tree, array, arraylen);
 	}
