@@ -1,7 +1,7 @@
 // Joan Andrés (@Andres6936) Github.
 
-#ifndef TWEAK_QUETYPE_HPP
-#define TWEAK_QUETYPE_HPP
+#ifndef TWEAK_QUEUE_HPP
+#define TWEAK_QUEUE_HPP
 
 #include <cstdint>
 
@@ -9,7 +9,7 @@ namespace Tweak
 {
 
 	template <typename ItemType>
-	class QueType
+	class Queue
 	{
 
 	private:
@@ -24,7 +24,7 @@ namespace Tweak
 
 	public:
 
-		QueType()
+		Queue()
 		{
 			maxQue = 501;
 			front = maxQue - 1;
@@ -32,7 +32,7 @@ namespace Tweak
 			items = new ItemType[maxQue];
 		}
 
-		QueType(std::size_t max)
+		Queue(std::size_t max)
 		{
 			maxQue = max + 1;
 			front = max - 1;
@@ -40,7 +40,7 @@ namespace Tweak
 			items = new ItemType[maxQue];
 		}
 
-		~QueType()
+		~Queue()
 		{
 			delete [] items;
 		}
@@ -91,4 +91,4 @@ namespace Tweak
 
 }
 
-#endif //TWEAK_QUETYPE_HPP
+#endif //TWEAK_QUEUE_HPP

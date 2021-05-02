@@ -5,7 +5,7 @@
 
 #include <cstdint>
 #include <fstream>
-#include <Tweak/QueType.hpp>
+#include <Tweak/Queue.hpp>
 
 namespace Tweak
 {
@@ -27,15 +27,15 @@ namespace Tweak
 
 		TreeNode<ItemType>* root {nullptr};
 
-		QueType<ItemType> preQue;
+		Queue<ItemType> preQue;
 
-		QueType<ItemType> inQue;
+		Queue<ItemType> inQue;
 
-		QueType<ItemType> postQue;
+		Queue<ItemType> postQue;
 
 		// Methods
 
-		void preOrder(TreeNode<ItemType>* tree, QueType<ItemType>& preQueue)
+		void preOrder(TreeNode<ItemType>* tree, Queue<ItemType>& preQueue)
 		{
 			if (tree not_eq nullptr)
 			{
@@ -45,7 +45,7 @@ namespace Tweak
 			}
 		}
 
-		void inOrder(TreeNode<ItemType>* tree, QueType<ItemType>& inQueue)
+		void inOrder(TreeNode<ItemType>* tree, Queue<ItemType>& inQueue)
 		{
 			if (tree not_eq nullptr)
 			{
@@ -55,7 +55,7 @@ namespace Tweak
 			}
 		}
 
-		void postOrder(TreeNode<ItemType>* tree, QueType<ItemType>& postQueue)
+		void postOrder(TreeNode<ItemType>* tree, Queue<ItemType>& postQueue)
 		{
 			if (tree not_eq nullptr)
 			{

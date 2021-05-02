@@ -3,13 +3,13 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <doctest/doctest.h>
-#include <Tweak/QueType.hpp>
+#include <Tweak/Queue.hpp>
 
 using namespace Tweak;
 
 TEST_CASE("Queue Type")
 {
-	QueType<char> queueChar;
+	Queue<char> queueChar;
 
 	CHECK(queueChar.isEmpty());
 	CHECK(not queueChar.isFull());
