@@ -9,5 +9,19 @@ using namespace Tweak;
 
 TEST_CASE("Binary Tree")
 {
+	BinaryTree<char> binaryTree;
 
+	CHECK(binaryTree.isEmpty());
+	CHECK(not binaryTree.isFull());
+
+	binaryTree.insertItem('D');
+	binaryTree.insertItem('B');
+	binaryTree.insertItem('A');
+	binaryTree.insertItem('C');
+	binaryTree.insertItem('F');
+	binaryTree.insertItem('E');
+	binaryTree.insertItem('G');
+
+	CHECK(not binaryTree.isEmpty());
+	CHECK(not binaryTree.isFull());
 }
