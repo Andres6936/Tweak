@@ -26,4 +26,13 @@ TEST_CASE("Queue Type")
 
 	queueChar.dequeue(result);
 	CHECK(result == 'A');
+	queueChar.dequeue(result);
+	CHECK(result == 'B');
+	queueChar.dequeue(result);
+	CHECK(result == 'C');
+	queueChar.dequeue(result);
+	CHECK(result == 'D');
+
+	CHECK(queueChar.isEmpty());
+	CHECK(not queueChar.isFull());
 }
