@@ -131,6 +131,21 @@ namespace Tweak
 			}
 		}
 
+		void copyTree(TreeNode<ItemType>*& copy, const TreeNode<ItemType>* original)
+		{
+			if (original == nullptr)
+			{
+				copy = nullptr;
+			}
+			else
+			{
+				copy = new TreeNode<ItemType>();
+				copy->info = original.info;
+				copyTree(copy->left, original->left);
+				copyTree(copy->right, original->right);
+			}
+		}
+
 		/**
 		 * @return The number of nodes in the tree.
 		 */
@@ -156,7 +171,10 @@ namespace Tweak
 
 		TreeNode() = default;
 
-		TreeType(const TreeType<ItemType>& original);
+		TreeType(const TreeType<ItemType>& original)
+		{
+			copyTree(root, original.root);
+		}
 
 		// Destructor
 
@@ -167,7 +185,16 @@ namespace Tweak
 
 		// Operators
 
-		void operator=(TreeType<ItemType>& original);
+		void operator=(const TreeType<ItemType>& original)
+		{
+			if (&original == this)
+			{
+				return;
+			}
+
+			destroy(root);
+			copyTree(root, original.root);
+		}
 
 		// Methods
 
