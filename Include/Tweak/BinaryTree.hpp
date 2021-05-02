@@ -18,7 +18,7 @@ namespace Tweak
 	};
 
 	template <typename ItemType>
-	class TreeType
+	class BinaryTree
 	{
 
 	private:
@@ -209,23 +209,23 @@ namespace Tweak
 
 		// Constructor
 
-		TreeType() = default;
+		BinaryTree() = default;
 
-		TreeType(const TreeType<ItemType>& original)
+		BinaryTree(const BinaryTree<ItemType>& original)
 		{
 			copyTree(root, original.root);
 		}
 
 		// Destructor
 
-		virtual ~TreeType()
+		virtual ~BinaryTree()
 		{
 			destroy(root);
 		}
 
 		// Operators
 
-		void operator=(const TreeType<ItemType>& original)
+		void operator=(const BinaryTree<ItemType>& original)
 		{
 			if (&original == this)
 			{
