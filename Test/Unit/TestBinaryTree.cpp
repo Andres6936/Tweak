@@ -28,4 +28,24 @@ TEST_CASE("Binary Tree")
 	CHECK(not binaryTree.isFull());
 
 	CHECK(binaryTree.lengthIs() == 7);
+
+	binaryTree.resetTree(OrderType::InOrder);
+
+	char result;
+	bool finished;
+
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'A');
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'B');
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'C');
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'D');
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'E');
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'F');
+	binaryTree.getNextItem(result, OrderType::InOrder, finished);
+	CHECK(result == 'G');
 }
