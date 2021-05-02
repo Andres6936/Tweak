@@ -21,4 +21,9 @@ TEST_CASE("Queue Type")
 
 	CHECK(not queueChar.isEmpty());
 	CHECK(not queueChar.isFull());
+
+	char result;
+
+	queueChar.dequeue(result);
+	CHECK(result == 'A');
 }
