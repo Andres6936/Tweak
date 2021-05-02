@@ -209,7 +209,7 @@ namespace Tweak
 
 		// Constructor
 
-		TreeNode() = default;
+		TreeType() = default;
 
 		TreeType(const TreeType<ItemType>& original)
 		{
@@ -243,7 +243,7 @@ namespace Tweak
 		/**
 		 * @return True if the tree is empty and false otherwise.
 		 */
-		bool isEmpty() const;
+		bool isEmpty() const
 		{
 			return root == nullptr;
 		}
