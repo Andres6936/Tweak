@@ -18,9 +18,9 @@ TEST_CASE("Binary Tree")
 
 	binaryTree.insertItem('D');
 	binaryTree.insertItem('B');
+	binaryTree.insertItem('F');
 	binaryTree.insertItem('A');
 	binaryTree.insertItem('C');
-	binaryTree.insertItem('F');
 	binaryTree.insertItem('E');
 	binaryTree.insertItem('G');
 
