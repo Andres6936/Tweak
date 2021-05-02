@@ -193,7 +193,7 @@ namespace Tweak
 		/**
 		 * @return The number of nodes in the tree.
 		 */
-		std::size_t countNodes(TreeNode<ItemType>* tree)
+		std::size_t countNodes(TreeNode<ItemType>* tree) const
 		{
 			if (tree == nullptr)
 			{
