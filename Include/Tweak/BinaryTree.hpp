@@ -111,6 +111,16 @@ namespace Tweak
 			}
 		}
 
+		void printTree(TreeNode<ItemType>* tree, std::ofstream& outFile)
+		{
+			if (tree not_eq nullptr)
+			{
+				printTree(tree->left, outFile);
+				outFile << tree->info;
+				printTree(tree->right, outFile);
+			}
+		}
+
 		/**
 		 * @return The number of nodes in the tree.
 		 */
@@ -188,7 +198,10 @@ namespace Tweak
 
 		void resetTree(OrderType order);
 
-		void print(std::ofstream& outFile) const;
+		void print(std::ofstream& outFile) const
+		{
+			printTree(root, outFile);
+		}
 
 		void retrieveItem(ItemType& item, bool& found) const
 		{
