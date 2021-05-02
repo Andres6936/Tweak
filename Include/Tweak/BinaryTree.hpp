@@ -238,8 +238,6 @@ namespace Tweak
 
 		// Methods
 
-		void makeEmpty();
-
 		/**
 		 * @return True if the tree is empty and false otherwise.
 		 */
