@@ -461,23 +461,27 @@ extern void buf_fetch_data(buffer* buf, void* vdata, int len, fileoffset_t pos)
 extern void buf_insert_data(buffer* buf, void* vdata, int len,
 		fileoffset_t pos)
 {
-	BinaryTree* bt = buf_bt_new();
-	int nblocks, blklen1, extra;
-	int i, origlen = len;
+	BinaryTree* pBinaryTree = buf_bt_new();
+	const int ORIGINAL_LENGTH = len;
 	unsigned char* data = (unsigned char*)vdata;
 
-	nblocks = len / ((BLKMIN + BLKMAX) / 2);
-	if (nblocks * BLKMAX < len)
-		nblocks++;
-	blklen1 = len / nblocks;
-	extra = len % nblocks;
-	assert(blklen1 >= BLKMIN || nblocks == 1);
-	assert(blklen1 <= BLKMAX - (extra != 0));
+	int numberBlocks = len / ((BLKMIN + BLKMAX) / 2);
 
-	for (i = 0; i < nblocks; i++)
+	if (numberBlocks * BLKMAX < len)
+	{
+		numberBlocks++;
+	}
+
+	const int BLOCK_LENGTH = len / numberBlocks;
+	const int EXTRA = len % numberBlocks;
+
+	assert(BLOCK_LENGTH >= BLKMIN || numberBlocks == 1);
+	assert(BLOCK_LENGTH <= BLKMAX - (EXTRA != 0));
+
+	for (int i = 0; i < numberBlocks; i++)
 	{
 		struct bufblk* blk;
-		int blklen = blklen1 + (i < extra);
+		int blklen = BLOCK_LENGTH + (i < EXTRA);
 
 		blk = (struct bufblk*)malloc(sizeof(struct bufblk) + BLKMAX);
 		blk->data = (unsigned char*)(blk + 1);
@@ -489,14 +493,14 @@ extern void buf_insert_data(buffer* buf, void* vdata, int len,
 		data += blklen;
 		len -= blklen;
 
-		bt_addpos(bt, blk, i);
-		assert(origlen == buf_bt_length(bt) + len);
+		bt_addpos(pBinaryTree, blk, i);
+		assert(ORIGINAL_LENGTH == buf_bt_length(pBinaryTree) + len);
 	}
 
 	assert(len == 0);
-	assert(origlen == buf_bt_length(bt));
+	assert(ORIGINAL_LENGTH == buf_bt_length(pBinaryTree));
 
-	buf_insert_bt(buf, bt, pos);
+	buf_insert_bt(buf, pBinaryTree, pos);
 }
 
 extern void buf_delete(buffer* buf, fileoffset_t len, fileoffset_t pos)
