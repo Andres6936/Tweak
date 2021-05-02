@@ -36,7 +36,7 @@
 #define alignof(typ) ( offsetof(struct { char c; typ t; }, t) )
 #endif
 
-typedef struct btree btree;
+typedef struct BinaryTree BinaryTree;
 typedef void* ItemType;
 
 typedef int (* cmpfn_t)(void* state, ItemType, ItemType);
@@ -59,50 +59,50 @@ enum
 	BT_REL_EQ, BT_REL_LT, BT_REL_LE, BT_REL_GT, BT_REL_GE
 };
 
-btree* bt_new(cmpfn_t cmp, copyfn_t copy, freefn_t freeelt,
+BinaryTree* bt_new(cmpfn_t cmp, copyfn_t copy, freefn_t freeelt,
 		int propsize, int propalign, propmakefn_t propmake,
 		propmergefn_t propmerge, void* state, int mindegree);
 
-void bt_free(btree* bt);
+void bt_free(BinaryTree* bt);
 
-btree* bt_clone(btree* bt);
+BinaryTree* bt_clone(BinaryTree* bt);
 
-int bt_count(btree* bt);
+int bt_count(BinaryTree* bt);
 
-ItemType bt_index(btree* bt, int index);
+ItemType bt_index(BinaryTree* bt, int index);
 
-ItemType bt_index_w(btree* bt, int index);
+ItemType bt_index_w(BinaryTree* bt, int index);
 
-ItemType bt_findrelpos(btree* bt, ItemType element, cmpfn_t cmp,
+ItemType bt_findrelpos(BinaryTree* bt, ItemType element, cmpfn_t cmp,
 		int relation, int* index);
 
-ItemType bt_findrel(btree* bt, ItemType element, cmpfn_t cmp,
+ItemType bt_findrel(BinaryTree* bt, ItemType element, cmpfn_t cmp,
 		int relation);
 
-ItemType bt_findpos(btree* bt, ItemType element, cmpfn_t cmp,
+ItemType bt_findpos(BinaryTree* bt, ItemType element, cmpfn_t cmp,
 		int* index);
 
-ItemType bt_find(btree* bt, ItemType element, cmpfn_t cmp);
+ItemType bt_find(BinaryTree* bt, ItemType element, cmpfn_t cmp);
 
-ItemType bt_propfind(btree* bt, searchfn_t search, void* sstate,
+ItemType bt_propfind(BinaryTree* bt, searchfn_t search, void* sstate,
 		int* index);
 
-ItemType bt_replace(btree* bt, ItemType element, int index);
+ItemType bt_replace(BinaryTree* bt, ItemType element, int index);
 
-void bt_addpos(btree* bt, ItemType element, int pos);
+void bt_addpos(BinaryTree* bt, ItemType element, int pos);
 
-ItemType bt_add(btree* bt, ItemType element);
+ItemType bt_add(BinaryTree* bt, ItemType element);
 
-ItemType bt_delpos(btree* bt, int pos);
+ItemType bt_delpos(BinaryTree* bt, int pos);
 
-ItemType bt_del(btree* bt, ItemType element);
+ItemType bt_del(BinaryTree* bt, ItemType element);
 
-btree* bt_join(btree* bt1, btree* bt2);
+BinaryTree* bt_join(BinaryTree* bt1, BinaryTree* bt2);
 
-btree* bt_joinr(btree* bt1, btree* bt2);
+BinaryTree* bt_joinr(BinaryTree* bt1, BinaryTree* bt2);
 
-btree* bt_splitpos(btree* bt, int index, int before);
+BinaryTree* bt_splitpos(BinaryTree* bt, int index, int before);
 
-btree* bt_split(btree* bt, ItemType element, cmpfn_t cmp, int rel);
+BinaryTree* bt_split(BinaryTree* bt, ItemType element, cmpfn_t cmp, int rel);
 
 #endif /* BTREE_H */

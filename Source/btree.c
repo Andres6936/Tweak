@@ -194,12 +194,12 @@ void testlock(int write, int set, nodeptr n);
 /*
  * Read and write the node_addr of a child.
  */
-static INLINE node_addr bt_child(btree* bt, nodeptr n, int index)
+static INLINE node_addr bt_child(BinaryTree* bt, nodeptr n, int index)
 {
 	return n[index].na;
 }
 
-static INLINE void bt_set_child(btree* bt, nodeptr n,
+static INLINE void bt_set_child(BinaryTree* bt, nodeptr n,
 		int index, node_addr value)
 {
 	n[index].na = value;
@@ -208,12 +208,12 @@ static INLINE void bt_set_child(btree* bt, nodeptr n,
 /*
  * Read and write the address of an element.
  */
-static INLINE ItemType bt_element(btree* bt, nodeptr n, int index)
+static INLINE ItemType bt_element(BinaryTree* bt, nodeptr n, int index)
 {
 	return n[bt->maxdegree + index].ep;
 }
 
-static INLINE void bt_set_element(btree* bt, nodeptr n,
+static INLINE void bt_set_element(BinaryTree* bt, nodeptr n,
 		int index, ItemType value)
 {
 	n[bt->maxdegree + index].ep = value;
@@ -222,7 +222,7 @@ static INLINE void bt_set_element(btree* bt, nodeptr n,
 /*
  * Give the number of subtrees currently present in an element.
  */
-static INLINE int bt_subtrees(btree* bt, nodeptr n)
+static INLINE int bt_subtrees(BinaryTree* bt, nodeptr n)
 {
 	return n[bt->maxdegree * 2 - 1].i;
 }
@@ -233,12 +233,12 @@ static INLINE int bt_subtrees(btree* bt, nodeptr n)
  * Give the minimum and maximum number of subtrees allowed in a
  * node.
  */
-static INLINE int bt_min_subtrees(btree* bt)
+static INLINE int bt_min_subtrees(BinaryTree* bt)
 {
 	return bt->mindegree;
 }
 
-static INLINE int bt_max_subtrees(btree* bt)
+static INLINE int bt_max_subtrees(BinaryTree* bt)
 {
 	return bt->maxdegree;
 }
@@ -254,7 +254,7 @@ static INLINE int bt_max_subtrees(btree* bt)
  * as the implementation of bt_read_lock(), so we're allowed to
  * know that read locking actually doesn't do anything.
  */
-static INLINE int bt_child_count(btree* bt, nodeptr n, int index)
+static INLINE int bt_child_count(BinaryTree* bt, nodeptr n, int index)
 {
 	if (n[index].na.p)
 		return n[index].na.p[bt->maxdegree * 2].i;
@@ -262,7 +262,7 @@ static INLINE int bt_child_count(btree* bt, nodeptr n, int index)
 		return 0;
 }
 
-static INLINE void* bt_child_prop(btree* bt, nodeptr n, int index)
+static INLINE void* bt_child_prop(BinaryTree* bt, nodeptr n, int index)
 {
 	if (n[index].na.p)
 		return (char*)n[index].na.p + bt->propoffset;
@@ -273,7 +273,7 @@ static INLINE void* bt_child_prop(btree* bt, nodeptr n, int index)
 /*
  * Return the count of items in a whole node.
  */
-static INLINE int bt_node_count(btree* bt, nodeptr n)
+static INLINE int bt_node_count(BinaryTree* bt, nodeptr n)
 {
 	return n[bt->maxdegree * 2].i;
 }
@@ -281,7 +281,7 @@ static INLINE int bt_node_count(btree* bt, nodeptr n)
 /*
  * Determine whether a node is a leaf node or not.
  */
-static INLINE int bt_is_leaf(btree* bt, nodeptr n)
+static INLINE int bt_is_leaf(BinaryTree* bt, nodeptr n)
 {
 	return n[0].na.p == NULL;
 }
@@ -289,7 +289,7 @@ static INLINE int bt_is_leaf(btree* bt, nodeptr n)
 /*
  * Create a new write-locked node, and return a pointer to it.
  */
-static INLINE nodeptr bt_new_node(btree* bt, int nsubtrees)
+static INLINE nodeptr bt_new_node(BinaryTree* bt, int nsubtrees)
 {
 	nodeptr ret = (nodecomponent*)smalloc(bt->propoffset + bt->propsize);
 	ret[bt->maxdegree * 2 - 1].i = nsubtrees;
@@ -306,7 +306,7 @@ static INLINE nodeptr bt_new_node(btree* bt, int nsubtrees)
 /*
  * Destroy a node (must be write-locked).
  */
-static INLINE void bt_destroy_node(btree* bt, nodeptr n)
+static INLINE void bt_destroy_node(BinaryTree* bt, nodeptr n)
 {
 	testlock(TRUE, FALSE, n);
 	/* Free the property. */
@@ -317,7 +317,7 @@ static INLINE void bt_destroy_node(btree* bt, nodeptr n)
 /*
  * Take an existing node and prepare to re-use it in a new context.
  */
-static INLINE nodeptr bt_reuse_node(btree* bt, nodeptr n, int nsubtrees)
+static INLINE nodeptr bt_reuse_node(BinaryTree* bt, nodeptr n, int nsubtrees)
 {
 	testlock(TRUE, FALSE, n);
 	testlock(TRUE, TRUE, n);
@@ -329,7 +329,7 @@ static INLINE nodeptr bt_reuse_node(btree* bt, nodeptr n, int nsubtrees)
  * Return an extra reference to a node, for purposes of cloning. So
  * we have to update its reference count as well.
  */
-static INLINE node_addr bt_ref_node(btree* bt, node_addr n)
+static INLINE node_addr bt_ref_node(BinaryTree* bt, node_addr n)
 {
 	if (n.p)
 		n.p[bt->maxdegree * 2 + 1].i++;
@@ -343,7 +343,7 @@ static INLINE node_addr bt_ref_node(btree* bt, node_addr n)
  * NULL node_addr causes a return of 1 (because this isn't
  * necessary).
  */
-static INLINE int bt_unref_node(btree* bt, node_addr n)
+static INLINE int bt_unref_node(BinaryTree* bt, node_addr n)
 {
 	if (n.p)
 	{
@@ -358,7 +358,7 @@ static INLINE int bt_unref_node(btree* bt, node_addr n)
  * Clone a node during write unlocking, if its reference count is
  * more than one.
  */
-static nodeptr bt_clone_node(btree* bt, nodeptr n)
+static nodeptr bt_clone_node(BinaryTree* bt, nodeptr n)
 {
 	int i;
 	nodeptr ret = (nodecomponent*)smalloc(bt->propoffset + bt->propsize);
@@ -399,7 +399,7 @@ static nodeptr bt_clone_node(btree* bt, nodeptr n)
  * means node movement must take place during _locking_ rather than
  * unlocking!
  */
-static INLINE node_addr bt_node_addr(btree* bt, nodeptr n)
+static INLINE node_addr bt_node_addr(BinaryTree* bt, nodeptr n)
 {
 	node_addr ret;
 	ret.p = n;
@@ -411,7 +411,7 @@ static INLINE node_addr bt_node_addr(btree* bt, nodeptr n)
  * handle being asked to write-lock a null node pointer, and just
  * return a null nodeptr.
  */
-static INLINE nodeptr bt_write_lock_child(btree* bt, nodeptr a, int index)
+static INLINE nodeptr bt_write_lock_child(BinaryTree* bt, nodeptr a, int index)
 {
 	node_addr addr = bt_child(bt, a, index);
 	if (addr.p && addr.p[bt->maxdegree * 2 + 1].i > 1)
@@ -425,7 +425,7 @@ static INLINE nodeptr bt_write_lock_child(btree* bt, nodeptr a, int index)
 	return addr.p;
 }
 
-static INLINE nodeptr bt_write_lock_root(btree* bt)
+static INLINE nodeptr bt_write_lock_root(BinaryTree* bt)
 {
 	node_addr addr = bt->root;
 	if (addr.p && addr.p[bt->maxdegree * 2 + 1].i > 1)
@@ -439,7 +439,7 @@ static INLINE nodeptr bt_write_lock_root(btree* bt)
 	return addr.p;
 }
 
-static INLINE nodeptr bt_read_lock(btree* bt, node_addr a)
+static INLINE nodeptr bt_read_lock(BinaryTree* bt, node_addr a)
 {
 	testlock(FALSE, TRUE, a.p);
 	return a.p;
@@ -448,7 +448,7 @@ static INLINE nodeptr bt_read_lock(btree* bt, node_addr a)
 #define bt_read_lock_root(bt) (bt_read_lock(bt, (bt)->root))
 #define bt_read_lock_child(bt, a, index) (bt_read_lock(bt,bt_child(bt,a,index)))
 
-static INLINE void bt_write_relock(btree* bt, nodeptr n, int props)
+static INLINE void bt_write_relock(BinaryTree* bt, nodeptr n, int props)
 {
 	int i, ns, count;
 
@@ -497,7 +497,7 @@ static INLINE void bt_write_relock(btree* bt, nodeptr n, int props)
 	}
 }
 
-static INLINE node_addr bt_write_unlock_internal(btree* bt, nodeptr n,
+static INLINE node_addr bt_write_unlock_internal(BinaryTree* bt, nodeptr n,
 		int props)
 {
 	node_addr ret;
@@ -510,12 +510,12 @@ static INLINE node_addr bt_write_unlock_internal(btree* bt, nodeptr n,
 	return ret;
 }
 
-static INLINE node_addr bt_write_unlock(btree* bt, nodeptr n)
+static INLINE node_addr bt_write_unlock(BinaryTree* bt, nodeptr n)
 {
 	return bt_write_unlock_internal(bt, n, TRUE);
 }
 
-static INLINE void bt_read_unlock(btree* bt, nodeptr n)
+static INLINE void bt_read_unlock(BinaryTree* bt, nodeptr n)
 {
 	/*
 	 * For trees in memory, we do nothing here, except run some
@@ -533,7 +533,7 @@ static INLINE void bt_read_unlock(btree* bt, nodeptr n)
  * Return the count of items below a node that appear before the
  * start of a given subtree.
  */
-static int bt_child_startpos(btree* bt, nodeptr n, int index)
+static int bt_child_startpos(BinaryTree* bt, nodeptr n, int index)
 {
 	int pos = 0;
 
@@ -548,7 +548,7 @@ static int bt_child_startpos(btree* bt, nodeptr n, int index)
 /*
  * Create a new root node for a tree.
  */
-static void bt_new_root(btree* bt, node_addr left, node_addr right,
+static void bt_new_root(BinaryTree* bt, node_addr left, node_addr right,
 		ItemType element)
 {
 	nodeptr n;
@@ -565,7 +565,7 @@ static void bt_new_root(btree* bt, node_addr left, node_addr right,
  * root. Expects to be passed a write-locked nodeptr to the old
  * root.
  */
-static void bt_shift_root(btree* bt, nodeptr n, node_addr na)
+static void bt_shift_root(BinaryTree* bt, nodeptr n, node_addr na)
 {
 	bt_destroy_node(bt, n);
 	bt->root = na;
@@ -588,7 +588,7 @@ static void bt_shift_root(btree* bt, nodeptr n, node_addr na)
 #define ENDS_RIGHT 2
 #define ENDS_BOTH  3
 
-static int bt_lookup_pos(btree* bt, nodeptr n, int* pos, int* ends)
+static int bt_lookup_pos(BinaryTree* bt, nodeptr n, int* pos, int* ends)
 {
 	int child = 0;
 	int nchildren = bt_subtrees(bt, n);
@@ -626,7 +626,7 @@ static int bt_lookup_pos(btree* bt, nodeptr n, int* pos, int* ends)
  * Since this may be used by bt_find() with an alternative cmpfn_t,
  * we always pass the input element as the first argument to cmp.
  */
-static int bt_lookup_cmp(btree* bt, nodeptr n, ItemType element,
+static int bt_lookup_cmp(BinaryTree* bt, nodeptr n, ItemType element,
 		cmpfn_t cmp, int* is_elt)
 {
 	int mintree = 0, maxtree = bt_subtrees(bt, n) - 1;
@@ -713,7 +713,7 @@ static int bt_lookup_cmp(btree* bt, nodeptr n, ItemType element,
 #define NODE_DEL_ELT 3
 #define NODE_JOIN -1
 
-static void bt_xform(btree* bt, int intype, int inaux,
+static void bt_xform(BinaryTree* bt, int intype, int inaux,
 		nodeptr in1, nodeptr in2, ItemType inelt,
 		node_addr extra1, node_addr extra2,
 		int splitpos, nodeptr* out1, nodeptr* out2,
@@ -863,13 +863,13 @@ static int bt_cmp_less(void* state,
  * User-visible administration routines.
  */
 
-btree* bt_new(cmpfn_t cmp, copyfn_t copy, freefn_t freeelt,
+BinaryTree* bt_new(cmpfn_t cmp, copyfn_t copy, freefn_t freeelt,
 		int propsize, int propalign, propmakefn_t propmake,
 		propmergefn_t propmerge, void* state, int mindegree)
 {
-	btree* ret;
+	BinaryTree* ret;
 
-	ret = new1(btree);
+	ret = new1(BinaryTree);
 	ret->mindegree = mindegree;
 	ret->maxdegree = 2 * mindegree;
 	ret->depth = 0;               /* not even a root right now */
@@ -892,7 +892,7 @@ btree* bt_new(cmpfn_t cmp, copyfn_t copy, freefn_t freeelt,
 	return ret;
 }
 
-static void bt_free_node(btree* bt, nodeptr n)
+static void bt_free_node(BinaryTree* bt, nodeptr n)
 {
 	int i;
 
@@ -918,7 +918,7 @@ static void bt_free_node(btree* bt, nodeptr n)
 	bt_destroy_node(bt, n);
 }
 
-void bt_free(btree* bt)
+void bt_free(BinaryTree* bt)
 {
 	nodeptr n;
 
@@ -931,9 +931,9 @@ void bt_free(btree* bt)
 	sfree(bt);
 }
 
-btree* bt_clone(btree* bt)
+BinaryTree* bt_clone(BinaryTree* bt)
 {
-	btree* bt2;
+	BinaryTree* bt2;
 
 	bt2 = bt_new(bt->cmp, bt->copy, bt->freeelt, bt->propsize, bt->propalign,
 			bt->propmake, bt->propmerge, bt->userstate, bt->mindegree);
@@ -945,7 +945,7 @@ btree* bt_clone(btree* bt)
 /*
  * Nice simple function to count the size of a tree.
  */
-int bt_count(btree* bt)
+int bt_count(BinaryTree* bt)
 {
 	int count;
 	nodeptr n;
@@ -974,7 +974,7 @@ int bt_count(btree* bt)
  * this if you were using tree cloning, and wanted to modify the
  * element once you'd found it.)
  */
-ItemType bt_index(btree* bt, int index)
+ItemType bt_index(BinaryTree* bt, int index)
 {
 	nodeptr n, n2;
 	int child, ends;
@@ -1003,7 +1003,7 @@ ItemType bt_index(btree* bt, int index)
 	}
 }
 
-ItemType bt_index_w(btree* bt, int index)
+ItemType bt_index_w(BinaryTree* bt, int index)
 {
 	nodeptr n, n2;
 	int nnodes, child, ends;
@@ -1044,7 +1044,7 @@ ItemType bt_index_w(btree* bt, int index)
 /*
  * Search for an element by sorted order.
  */
-ItemType bt_findrelpos(btree* bt, ItemType element, cmpfn_t cmp,
+ItemType bt_findrelpos(BinaryTree* bt, ItemType element, cmpfn_t cmp,
 		int relation, int* index)
 {
 	nodeptr n, n2;
@@ -1127,19 +1127,19 @@ ItemType bt_findrelpos(btree* bt, ItemType element, cmpfn_t cmp,
 	return gotit;
 }
 
-ItemType bt_findrel(btree* bt, ItemType element, cmpfn_t cmp,
+ItemType bt_findrel(BinaryTree* bt, ItemType element, cmpfn_t cmp,
 		int relation)
 {
 	return bt_findrelpos(bt, element, cmp, relation, NULL);
 }
 
-ItemType bt_findpos(btree* bt, ItemType element, cmpfn_t cmp,
+ItemType bt_findpos(BinaryTree* bt, ItemType element, cmpfn_t cmp,
 		int* index)
 {
 	return bt_findrelpos(bt, element, cmp, BT_REL_EQ, index);
 }
 
-ItemType bt_find(btree* bt, ItemType element, cmpfn_t cmp)
+ItemType bt_find(BinaryTree* bt, ItemType element, cmpfn_t cmp)
 {
 	return bt_findrelpos(bt, element, cmp, BT_REL_EQ, NULL);
 }
@@ -1152,7 +1152,7 @@ ItemType bt_find(btree* bt, ItemType element, cmpfn_t cmp)
  * index of either the element or the gap in `*index' if `index' is
  * non-NULL.
  */
-ItemType bt_propfind(btree* bt, searchfn_t search, void* sstate,
+ItemType bt_propfind(BinaryTree* bt, searchfn_t search, void* sstate,
 		int* index)
 {
 	nodeptr n, n2;
@@ -1236,7 +1236,7 @@ ItemType bt_propfind(btree* bt, searchfn_t search, void* sstate,
  * element, but has changed in some way that will affect user
  * properties.
  */
-ItemType bt_replace(btree* bt, ItemType element, int index)
+ItemType bt_replace(BinaryTree* bt, ItemType element, int index)
 {
 	nodeptr n;
 	nodeptr* nodes;
@@ -1279,7 +1279,7 @@ ItemType bt_replace(btree* bt, ItemType element, int index)
  * write-lock every node we meet, since otherwise we might fail to
  * clone nodes that will end up pointing to different things.
  */
-void bt_addpos(btree* bt, ItemType element, int pos)
+void bt_addpos(BinaryTree* bt, ItemType element, int pos)
 {
 	nodeptr n;
 	node_addr left, right, single;
@@ -1381,7 +1381,7 @@ void bt_addpos(btree* bt, ItemType element, int pos)
  * known that the item _can_ be added to the tree (and isn't
  * duplicated in it already).
  */
-ItemType bt_add(btree* bt, ItemType element)
+ItemType bt_add(BinaryTree* bt, ItemType element)
 {
 	nodeptr n, n2;
 	int child, is_elt;
@@ -1412,7 +1412,7 @@ ItemType bt_add(btree* bt, ItemType element)
  * Delete an element given its numeric position. Returns the
  * element deleted.
  */
-ItemType bt_delpos(btree* bt, int pos)
+ItemType bt_delpos(BinaryTree* bt, int pos)
 {
 	nodeptr n, c, c2, saved_n;
 	nodeptr* nodes;
@@ -1618,7 +1618,7 @@ ItemType bt_delpos(btree* bt, int pos)
 /*
  * Delete an element in sorted order.
  */
-ItemType bt_del(btree* bt, ItemType element)
+ItemType bt_del(BinaryTree* bt, ItemType element)
 {
 	int index;
 	if (!bt_findrelpos(bt, element, NULL, BT_REL_EQ, &index))
@@ -1636,7 +1636,7 @@ ItemType bt_del(btree* bt, ItemType element)
  * The input nodeptrs are assumed to be write-locked, but none of
  * their children are yet write-locked.
  */
-static void bt_join_internal(btree* bt, nodeptr lp, nodeptr rp,
+static void bt_join_internal(BinaryTree* bt, nodeptr lp, nodeptr rp,
 		ItemType sep, int ld, int rd)
 {
 	nodeptr* nodes;
@@ -1793,7 +1793,7 @@ static void bt_join_internal(btree* bt, nodeptr lp, nodeptr rp,
  * (differing only in which B-tree structure they leave without any
  * elements, and which they return the combined tree in).
  */
-btree* bt_join(btree* bt1, btree* bt2)
+BinaryTree* bt_join(BinaryTree* bt1, BinaryTree* bt2)
 {
 	nodeptr root1, root2;
 	int size2;
@@ -1826,7 +1826,7 @@ btree* bt_join(btree* bt1, btree* bt2)
 	return bt1;
 }
 
-btree* bt_joinr(btree* bt1, btree* bt2)
+BinaryTree* bt_joinr(BinaryTree* bt1, BinaryTree* bt2)
 {
 	nodeptr root1, root2;
 	int size1;
@@ -1863,7 +1863,7 @@ btree* bt_joinr(btree* bt1, btree* bt2)
  * Perform the healing process after a tree has been split. `rhs'
  * is set if the cut edge is the one on the right.
  */
-static void bt_split_heal(btree* bt, int rhs)
+static void bt_split_heal(BinaryTree* bt, int rhs)
 {
 	nodeptr n;
 	nodeptr* nodes;
@@ -1987,9 +1987,9 @@ static void bt_split_heal(btree* bt, int rhs)
  * one on the right; the original tree contains the stuff on the
  * left.
  */
-static btree* bt_split_internal(btree* bt1, int index)
+static BinaryTree* bt_split_internal(BinaryTree* bt1, int index)
 {
-	btree* bt2;
+	BinaryTree* bt2;
 	nodeptr* lnodes, * rnodes;
 	nodeptr n1, n2, n;
 	int nnodes, child;
@@ -2050,9 +2050,9 @@ static btree* bt_split_internal(btree* bt1, int index)
 /*
  * Split a tree at a numeric index.
  */
-btree* bt_splitpos(btree* bt, int index, int before)
+BinaryTree* bt_splitpos(BinaryTree* bt, int index, int before)
 {
-	btree* ret;
+	BinaryTree* ret;
 	node_addr na;
 	int count, nd;
 	nodeptr n;
@@ -2081,7 +2081,7 @@ btree* bt_splitpos(btree* bt, int index, int before)
 /*
  * Split a tree at a position dictated by the sorting order.
  */
-btree* bt_split(btree* bt, ItemType element, cmpfn_t cmp, int rel)
+BinaryTree* bt_split(BinaryTree* bt, ItemType element, cmpfn_t cmp, int rel)
 {
 	int before, index;
 

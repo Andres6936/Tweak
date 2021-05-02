@@ -24,7 +24,7 @@ struct file
 
 struct buffer
 {
-	btree* bt;
+	BinaryTree* bt;
 };
 
 struct bufblk
@@ -96,7 +96,7 @@ void bufblkpropmerge(void* state, void* s1v, void* s2v, void* destv)
 	*dest = *s2 + (s1 ? *s1 : 0);
 }
 
-static buffer* buf_new_from_bt(btree* bt)
+static buffer* buf_new_from_bt(BinaryTree* bt)
 {
 	buffer* buf = (buffer*)malloc(sizeof(buffer));
 
@@ -105,7 +105,7 @@ static buffer* buf_new_from_bt(btree* bt)
 	return buf;
 }
 
-static btree* buf_bt_new(void)
+static BinaryTree* buf_bt_new(void)
 {
 	return bt_new(NULL, bufblkcopy, bufblkfree, sizeof(fileoffset_t),
 			alignof(fileoffset_t), bufblkpropmake, bufblkpropmerge,
@@ -166,7 +166,7 @@ static int bufblksearch(void* tstate, void* sstate, int ntrees,
 	return 0;                   /* placate gcc */
 }
 
-static int buf_bt_find_pos(btree* bt, fileoffset_t pos, fileoffset_t* poswithin)
+static int buf_bt_find_pos(BinaryTree* bt, fileoffset_t pos, fileoffset_t* poswithin)
 {
 	int index;
 
@@ -206,7 +206,7 @@ static struct bufblk* buf_convert_to_literal(struct bufblk* blk)
  * redistribute. Returns 0 if it has not changed the number of
  * blocks, or 1 if it has merged two.
  */
-static int buf_bt_cleanup(btree* bt, int index)
+static int buf_bt_cleanup(BinaryTree* bt, int index)
 {
 	struct bufblk* a, * b, * cvt;
 	fileoffset_t totallen;
@@ -283,7 +283,7 @@ static int buf_bt_cleanup(btree* bt, int index)
 	}
 }
 
-static int buf_bt_splitpoint(btree* bt, fileoffset_t pos)
+static int buf_bt_splitpoint(BinaryTree* bt, fileoffset_t pos)
 {
 	fileoffset_t poswithin;
 	int index;
@@ -319,16 +319,16 @@ static int buf_bt_splitpoint(btree* bt, fileoffset_t pos)
 	return index + 1;
 }
 
-static btree* buf_bt_split(btree* bt, fileoffset_t pos, int before)
+static BinaryTree* buf_bt_split(BinaryTree* bt, fileoffset_t pos, int before)
 {
 	int index = buf_bt_splitpoint(bt, pos);
 	return bt_splitpos(bt, index, before);
 }
 
-static btree* buf_bt_join(btree* a, btree* b)
+static BinaryTree* buf_bt_join(BinaryTree* a, BinaryTree* b)
 {
 	int index = bt_count(a) - 1;
-	btree* ret;
+	BinaryTree* ret;
 
 	ret = bt_join(a, b);
 
@@ -337,9 +337,9 @@ static btree* buf_bt_join(btree* a, btree* b)
 	return ret;
 }
 
-static void buf_insert_bt(buffer* buf, btree* bt, fileoffset_t pos)
+static void buf_insert_bt(buffer* buf, BinaryTree* bt, fileoffset_t pos)
 {
-	btree* right = buf_bt_split(buf->bt, pos, FALSE);
+	BinaryTree* right = buf_bt_split(buf->bt, pos, FALSE);
 	buf->bt = buf_bt_join(buf->bt, bt);
 	buf->bt = buf_bt_join(buf->bt, right);
 }
@@ -374,7 +374,7 @@ static int bufblklensearch(void* tstate, void* sstate, int ntrees,
 	return 1;
 }
 
-static fileoffset_t buf_bt_length(btree* bt)
+static fileoffset_t buf_bt_length(BinaryTree* bt)
 {
 	fileoffset_t length;
 
@@ -461,7 +461,7 @@ extern void buf_fetch_data(buffer* buf, void* vdata, int len, fileoffset_t pos)
 extern void buf_insert_data(buffer* buf, void* vdata, int len,
 		fileoffset_t pos)
 {
-	btree* bt = buf_bt_new();
+	BinaryTree* bt = buf_bt_new();
 	int nblocks, blklen1, extra;
 	int i, origlen = len;
 	unsigned char* data = (unsigned char*)vdata;
@@ -501,8 +501,8 @@ extern void buf_insert_data(buffer* buf, void* vdata, int len,
 
 extern void buf_delete(buffer* buf, fileoffset_t len, fileoffset_t pos)
 {
-	btree* left = buf_bt_split(buf->bt, pos, TRUE);
-	btree* right = buf_bt_split(buf->bt, len, FALSE);
+	BinaryTree* left = buf_bt_split(buf->bt, pos, TRUE);
+	BinaryTree* right = buf_bt_split(buf->bt, len, FALSE);
 
 	bt_free(buf->bt);
 
@@ -518,9 +518,9 @@ extern void buf_overwrite_data(buffer* buf, void* data, int len,
 
 extern buffer* buf_cut(buffer* buf, fileoffset_t len, fileoffset_t pos)
 {
-	btree* left = buf_bt_split(buf->bt, pos, TRUE);
-	btree* right = buf_bt_split(buf->bt, len, FALSE);
-	btree* ret = buf->bt;
+	BinaryTree* left = buf_bt_split(buf->bt, pos, TRUE);
+	BinaryTree* right = buf_bt_split(buf->bt, len, FALSE);
+	BinaryTree* ret = buf->bt;
 
 	buf->bt = buf_bt_join(left, right);
 
@@ -529,9 +529,9 @@ extern buffer* buf_cut(buffer* buf, fileoffset_t len, fileoffset_t pos)
 
 extern buffer* buf_copy(buffer* buf, fileoffset_t len, fileoffset_t pos)
 {
-	btree* left = buf_bt_split(buf->bt, pos, TRUE);
-	btree* right = buf_bt_split(buf->bt, len, FALSE);
-	btree* ret = bt_clone(buf->bt);
+	BinaryTree* left = buf_bt_split(buf->bt, pos, TRUE);
+	BinaryTree* right = buf_bt_split(buf->bt, len, FALSE);
+	BinaryTree* ret = bt_clone(buf->bt);
 
 	buf->bt = buf_bt_join(left, buf->bt);
 	buf->bt = buf_bt_join(buf->bt, right);
@@ -541,7 +541,7 @@ extern buffer* buf_copy(buffer* buf, fileoffset_t len, fileoffset_t pos)
 
 extern void buf_paste(buffer* buf, buffer* cutbuffer, fileoffset_t pos)
 {
-	btree* bt = bt_clone(cutbuffer->bt);
+	BinaryTree* bt = bt_clone(cutbuffer->bt);
 	buf_insert_bt(buf, bt, pos);
 }
 
