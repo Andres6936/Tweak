@@ -13,7 +13,7 @@
 <p class="text-muted text-end">
     by <a href="http://pobox.com/~anakin/">Simon Tatham</a>
 </p>
-<h2><a name="S1"></a>1. Introduction</h2>
+<h2 class="my-5"><a name="S1"></a>1. Introduction</h2>
 <p>
     Hex editors have been around for a long time, and at the very basic level they are very simple
     to write. Since they are mostly used for editing files such as executables, which contain a lot
@@ -33,7 +33,7 @@
     In this article I present an efficient and scalable data structure which supports all the
     operations needed by a hex editor.
 </p>
-<h2><a name="S2"></a>2. Simple options</h2>
+<h2 class="my-5"><a name="S2"></a>2. Simple options</h2>
 <p>
     One technique used to support insert mode in editors is to use an array larger than the file
     size, with a gap in it. The file contents up to the current cursor position are stored at the
@@ -65,7 +65,7 @@
     operation, seeking to a given byte position becomes linear-time. Whereas in the original array
     format, of course, seeking was constant-time but <em>insertion</em> became linear-time.
 </p>
-<h2><a name="S3"></a>3. Using balanced trees</h2>
+<h2 class="my-5"><a name="S3"></a>3. Using balanced trees</h2>
 <p>
     This is where trees come in. Balanced tree structures (any of AVL trees, red-black trees and
     B-trees) all solve this sort of problem for sorted lists. You can insert an element into a
@@ -84,7 +84,7 @@
 <p>
     Is there anything we can do to our balanced trees to make this work better?
 </p>
-<h2><a name="S4"></a>4. Counted trees</h2>
+<h2 class="my-5"><a name="S4"></a>4. Counted trees</h2>
 <p>
     Yes, there is.
 </p>
@@ -134,7 +134,7 @@
     The trouble is, we're still stuck with having some sort of sorting order on the tree. Now we
     need to deal with that.
 </p>
-<h2><a name="S5"></a>5. Unsorted trees</h2>
+<h2 class="my-5"><a name="S5"></a>5. Unsorted trees</h2>
 <p>
     The simple answer to the sorting problem is to do away with sorting the tree at all!
 </p>
@@ -158,7 +158,7 @@
     an unordered list of items, in such a way that we can insert or delete an item in log time <em>and</em>
     find the Nth element in log time.
 </p>
-<h2><a name="S6"></a>6. Splitting and joining trees</h2>
+<h2 class="my-5"><a name="S6"></a>6. Splitting and joining trees</h2>
 <p>
     Now we can begin to get more ambitious. One issue we have not addressed yet is cut and paste.
 </p>
@@ -205,7 +205,7 @@
     half on to the left side of the inserted section, and join the right half on to the right side
     of the inserted section.
 </p>
-<h3><a name="S6.1"></a>6.1. Joining two B-trees together</h3>
+<h3 class="my-5"><a name="S6.1"></a>6.1. Joining two B-trees together</h3>
 <p>
     When you add an element to a B-tree, sometimes it ends up increasing the size of a leaf node
     beyond the size limit. When that happens, you deal with it by splitting the node in two, and
@@ -237,7 +237,7 @@
     of the right-hand tree using the ordinary tree deletion algorithm. Then we just do the join
     algorithm, as described above, using the element we just removed as our separator.
 </p>
-<h3><a name="S6.2"></a>6.2. Splitting a B-tree in two</h3>
+<h3 class="my-5"><a name="S6.2"></a>6.2. Splitting a B-tree in two</h3>
 <p>
     To split a B-tree in two: we are given a tree, and a means of searching down the tree to find
     the split point. (In this application, that will be a numeric position, which we check against
@@ -299,7 +299,7 @@
     thing again. Eventually we reach the bottom of the tree and every node is of valid size. Then we
     do the same thing to the cut edge of the other tree, and we're done.
 </p>
-<h2><a name="S7"></a>7. Cloning trees</h2>
+<h2 class="my-5"><a name="S7"></a>7. Cloning trees</h2>
 <p>
     The splitting and joining algorithms look as if they make cut and paste pretty much trivial. You
     can split a big chunk out of your editing buffer into a separate cut buffer easily enough; and
@@ -365,7 +365,7 @@
     the hex editor isn't actually using up 1600Mb more memory, because most of it is in shared
     nodes! This technique naturally provides a form of compression as well as being fast.
 </p>
-<h2><a name="S8"></a>8. Lazy file loading</h2>
+<h2 class="my-5"><a name="S8"></a>8. Lazy file loading</h2>
 <p>
     In all of the above I have been tacitly assuming that the data elements stored in my tree are
     individual bytes. This would be hideously inefficient if I were using AVL or red-black trees, in
@@ -469,7 +469,7 @@
     editor to be able to do, and does it all at a reasonable memory cost and (apart from the two
     genuinely necessary operations of searching and saving) <em>all</em> in O(log N) time.
 </p>
-<h2><a name="S9"></a>9. Further directions</h2>
+<h2 class="my-5"><a name="S9"></a>9. Further directions</h2>
 <p>
     The data structure as I have presented it is suitable for use in a high-performance hex editor
     with an insert mode.
@@ -477,7 +477,7 @@
 <p>
     There are a couple more points worth noting.
 </p>
-<h3><a name="S9.1"></a>9.1. Conventional text editing</h3>
+<h3 class="my-5"><a name="S9.1"></a>9.1. Conventional text editing</h3>
 <p>
     This structure would need only minor modifications to be an efficient basis for a conventional
     text editor. In order to do this, you would need to be able to jump quickly to a particular <em>line</em>
@@ -522,7 +522,7 @@
     all the newlines are in its buffer, so there would probably be no alternative to physically
     loading the file. But in that, at least, this data structure is no worse than any other.
 </p>
-<h3><a name="S9.2"></a>9.2. Supporting undo</h3>
+<h3 class="my-5"><a name="S9.2"></a>9.2. Supporting undo</h3>
 <p>
     An undo function in an editor <em>conceptually</em> stores a sequence of previous buffer states,
     and allows you to return to one of them when you need to.
@@ -544,7 +544,7 @@
     cost of maintaining too many buffer clones might still become prohibitive. But it's an
     interesting possibility regardless.
 </p>
-<h2><a name="S10"></a>10. Summary</h2>
+<h2 class="my-5"><a name="S10"></a>10. Summary</h2>
 <p>
     I've presented a design for a data structure which implements practically every operation
     required for a hex editor in O(log N) time, apart from one or two which genuinely <em>need</em>
@@ -604,7 +604,7 @@
     I've also sketched a means of converting this into a data structure for an ordinary text editor,
     and suggested interesting implications in the area of undo operations.
 </p>
-<h2><a name="S11"></a>11. References</h2>
+<h2 class="my-5"><a name="S11"></a>11. References</h2>
 <p>
     Donald Knuth's &#8216;The Art of Computer Programming&#8217; (<a
         href="http://en.wikipedia.org/w/wiki.phtml?title=Special:Booksources&amp;isbn=0201485419">Addison-Wesley,
@@ -620,7 +620,7 @@
 </p>
 
 <hr>
-<address>
+<address class="text-muted text-end">
     [tweak version 3.02]
 </address>
 <script src="js/bootstrap.bundle.min.js"></script>
