@@ -144,7 +144,7 @@ namespace Tweak
 
 		// Constructor
 
-		TreeNode();
+		TreeNode() = default;
 
 		TreeType(const TreeType<ItemType>& original);
 
