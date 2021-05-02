@@ -27,7 +27,7 @@ struct buffer
 	BinaryTree* bt;
 };
 
-struct bufblk
+struct BufferBlock
 {
 	fileoffset_t len;               /* number of bytes in block, always */
 	struct file* file;               /* non-NULL indicates a file block */
@@ -37,18 +37,18 @@ struct bufblk
 
 static ItemType bufblkcopy(void* state, void* av)
 {
-	struct bufblk* a = (struct bufblk*)av;
-	struct bufblk* ret;
+	struct BufferBlock* a = (struct BufferBlock*)av;
+	struct BufferBlock* ret;
 
 	if (a->file)
 	{
-		ret = (struct bufblk*)malloc(sizeof(struct bufblk));
+		ret = (struct BufferBlock*)malloc(sizeof(struct BufferBlock));
 		ret->data = NULL;
 		a->file->refcount++;
 	}
 	else
 	{
-		ret = (struct bufblk*)malloc(sizeof(struct bufblk) + BLKMAX);
+		ret = (struct BufferBlock*)malloc(sizeof(struct BufferBlock) + BLKMAX);
 		ret->data = (unsigned char*)(ret + 1);
 		memcpy(ret->data, a->data, BLKMAX);
 	}
@@ -62,7 +62,7 @@ static ItemType bufblkcopy(void* state, void* av)
 
 static void bufblkfree(void* state, void* av)
 {
-	struct bufblk* a = (struct bufblk*)av;
+	struct BufferBlock* a = (struct BufferBlock*)av;
 
 	if (a->file)
 	{
@@ -80,7 +80,7 @@ static void bufblkfree(void* state, void* av)
 
 void bufblkpropmake(void* state, ItemType av, void* destv)
 {
-	struct bufblk* a = (struct bufblk*)av;
+	struct BufferBlock* a = (struct BufferBlock*)av;
 	fileoffset_t* dest = (fileoffset_t*)destv;
 
 	*dest = a->len;
@@ -128,7 +128,7 @@ static int bufblksearch(void* tstate, void* sstate, int ntrees,
 
 	for (i = 0; i < ntrees; i++)
 	{
-		struct bufblk* blk;
+		struct BufferBlock* blk;
 		fileoffset_t sublen = props[i] ? *(fileoffset_t*)props[i] : 0;
 
 		if ((props[i] && *disttogo < distsofar + sublen) ||
@@ -146,7 +146,7 @@ static int bufblksearch(void* tstate, void* sstate, int ntrees,
 
 		if (i < ntrees - 1)
 		{
-			blk = (struct bufblk*)elts[i];
+			blk = (struct BufferBlock*)elts[i];
 
 			if (*disttogo < distsofar + blk->len)
 			{
@@ -181,12 +181,12 @@ static int buf_bt_find_pos(BinaryTree* bt, fileoffset_t pos, fileoffset_t* poswi
  * literal-data block. Returns the replacement block (the old one
  * still needs freeing) or NULL if no conversion performed.
  */
-static struct bufblk* buf_convert_to_literal(struct bufblk* blk)
+static struct BufferBlock* buf_convert_to_literal(struct BufferBlock* blk)
 {
 	if (blk->file && blk->len <= BLKMAX)
 	{
-		struct bufblk* ret =
-				(struct bufblk*)malloc(sizeof(struct bufblk) + BLKMAX);
+		struct BufferBlock* ret =
+				(struct BufferBlock*)malloc(sizeof(struct BufferBlock) + BLKMAX);
 		ret->data = (unsigned char*)(ret + 1);
 		ret->file = NULL;
 		ret->filepos = 0;
@@ -208,14 +208,14 @@ static struct bufblk* buf_convert_to_literal(struct bufblk* blk)
  */
 static int buf_bt_cleanup(BinaryTree* bt, int index)
 {
-	struct bufblk* a, * b, * cvt;
+	struct BufferBlock* a, * b, * cvt;
 	fileoffset_t totallen;
 	unsigned char tmpdata[BLKMAX * 2];
 
 	if (index < 0) return 0;
 
-	a = (struct bufblk*)bt_index(bt, index);
-	b = (struct bufblk*)bt_index(bt, index + 1);
+	a = (struct BufferBlock*)bt_index(bt, index);
+	b = (struct BufferBlock*)bt_index(bt, index + 1);
 
 	if (a && (cvt = buf_convert_to_literal(a)) != NULL)
 	{
@@ -238,8 +238,8 @@ static int buf_bt_cleanup(BinaryTree* bt, int index)
 	assert(a->len <= BLKMAX && b->len <= BLKMAX);
 
 	/* Use bt_index_w to ensure reference count of 1 on both blocks */
-	a = (struct bufblk*)bt_index_w(bt, index);
-	b = (struct bufblk*)bt_index_w(bt, index + 1);
+	a = (struct BufferBlock*)bt_index_w(bt, index);
+	b = (struct BufferBlock*)bt_index_w(bt, index + 1);
 
 	/*
 	 * So, we have one block with size at most BLKMIN, and another
@@ -287,7 +287,7 @@ static int buf_bt_splitpoint(BinaryTree* bt, fileoffset_t pos)
 {
 	fileoffset_t poswithin;
 	int index;
-	struct bufblk* blk, * newblk;
+	struct BufferBlock* blk, * newblk;
 
 	index = buf_bt_find_pos(bt, pos, &poswithin);
 
@@ -297,8 +297,8 @@ static int buf_bt_splitpoint(BinaryTree* bt, fileoffset_t pos)
 	/*
 	 * Now split element `index' at position `poswithin'.
 	 */
-	blk = (struct bufblk*)bt_index_w(bt, index);   /* ensure ref count == 1 */
-	newblk = (struct bufblk*)bufblkcopy(NULL, blk);
+	blk = (struct BufferBlock*)bt_index_w(bt, index);   /* ensure ref count == 1 */
+	newblk = (struct BufferBlock*)bufblkcopy(NULL, blk);
 
 	if (!newblk->file)
 	{
@@ -354,14 +354,14 @@ static int bufblklensearch(void* tstate, void* sstate, int ntrees,
 
 	for (i = 0; i < ntrees; i++)
 	{
-		struct bufblk* blk;
+		struct BufferBlock* blk;
 
 		if (props[i])
 			size += *(fileoffset_t*)props[i];
 
 		if (i < ntrees - 1)
 		{
-			blk = (struct bufblk*)elts[i];
+			blk = (struct BufferBlock*)elts[i];
 
 			size += blk->len;
 		}
@@ -400,14 +400,14 @@ extern buffer* buf_new_empty(void)
 extern buffer* buf_new_from_file(FILE* fp)
 {
 	buffer* buf = buf_new_empty();
-	struct bufblk* blk;
+	struct BufferBlock* blk;
 	struct file* file;
 
 	file = (struct file*)malloc(sizeof(struct file));
 	file->fp = fp;
 	file->refcount = 1;               /* the reference we're about to make */
 
-	blk = (struct bufblk*)malloc(sizeof(struct bufblk));
+	blk = (struct BufferBlock*)malloc(sizeof(struct BufferBlock));
 	blk->data = NULL;
 	blk->file = file;
 	blk->filepos = 0;
@@ -433,7 +433,7 @@ extern void buf_fetch_data(buffer* buf, void* vdata, int len, fileoffset_t pos)
 
 	while (len > 0)
 	{
-		struct bufblk* blk = (struct bufblk*)bt_index(buf->bt, index);
+		struct BufferBlock* blk = (struct BufferBlock*)bt_index(buf->bt, index);
 
 		thislen = blk->len - poswithin;
 		if (thislen > len)
@@ -480,10 +480,10 @@ extern void buf_insert_data(buffer* buf, void* vdata, int len,
 
 	for (int i = 0; i < numberBlocks; i++)
 	{
-		struct bufblk* blk;
+		struct BufferBlock* blk;
 		int blklen = BLOCK_LENGTH + (i < EXTRA);
 
-		blk = (struct bufblk*)malloc(sizeof(struct bufblk) + BLKMAX);
+		blk = (struct BufferBlock*)malloc(sizeof(struct BufferBlock) + BLKMAX);
 		blk->data = (unsigned char*)(blk + 1);
 		memcpy(blk->data, data, blklen);
 		blk->len = blklen;
@@ -555,7 +555,7 @@ extern void buffer_diagnostic(buffer *buf, char *title)
 {
 	int i;
 	fileoffset_t offset;
-	struct bufblk *blk;
+	struct BufferBlock *blk;
 
 	if (!debugfp) {
 	debugfp = fdopen(3, "w");
@@ -570,7 +570,7 @@ extern void buffer_diagnostic(buffer *buf, char *title)
 
 	fprintf(debugfp, "Listing of buffer [%s]:\n", title);
 	offset = 0;
-	for (i = 0; (blk = (struct bufblk *)bt_index(buf->bt, i)) != NULL; i++) {
+	for (i = 0; (blk = (struct BufferBlock *)bt_index(buf->bt, i)) != NULL; i++) {
 	fprintf(debugfp, "%016"OFF"x: %p, len =%8"OFF"d,", offset, blk, blk->len);
 	if (blk->file) {
 		fprintf(debugfp, " file %p pos %8"OFF"d\n", blk->file, blk->filepos);
