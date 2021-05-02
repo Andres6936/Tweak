@@ -4,6 +4,8 @@
 #define TWEAK_BINARYTREE_HPP
 
 #include <cstdint>
+#include <fstream>
+#include <Tweak/QueType.hpp>
 
 namespace Tweak
 {
@@ -25,15 +27,15 @@ namespace Tweak
 
 		TreeNode<ItemType>* root {nullptr};
 
-		QueType preQue;
+		QueType<ItemType> preQue;
 
-		QueType inQue;
+		QueType<ItemType> inQue;
 
-		QueType postQue;
+		QueType<ItemType> postQue;
 
 		// Methods
 
-		void preOrder(TreeNode<ItemType>* tree, QueType& preQueue)
+		void preOrder(TreeNode<ItemType>* tree, QueType<ItemType>& preQueue)
 		{
 			if (tree not_eq nullptr)
 			{
@@ -43,7 +45,7 @@ namespace Tweak
 			}
 		}
 
-		void inOrder(TreeNode<ItemType>* tree, QueType& inQueue)
+		void inOrder(TreeNode<ItemType>* tree, QueType<ItemType>& inQueue)
 		{
 			if (tree not_eq nullptr)
 			{
@@ -53,7 +55,7 @@ namespace Tweak
 			}
 		}
 
-		void postOrder(TreeNode<ItemType>* tree, QueType& postQueue)
+		void postOrder(TreeNode<ItemType>* tree, QueType<ItemType>& postQueue)
 		{
 			if (tree not_eq nullptr)
 			{
