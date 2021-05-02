@@ -209,6 +209,11 @@ namespace Tweak
 
 		// Constructor
 
+		/**
+		 * Initializes tree to empty state.
+		 *
+		 * @post Tree exists and is empty.
+		 */
 		BinaryTree() = default;
 
 		BinaryTree(const BinaryTree<ItemType>& original)
@@ -239,6 +244,9 @@ namespace Tweak
 		// Methods
 
 		/**
+		 * Determine whether tree is empty.
+		 *
+		 * @post Function value = (tree is empty).
 		 * @return True if the tree is empty and false otherwise.
 		 */
 		bool isEmpty() const
@@ -247,6 +255,9 @@ namespace Tweak
 		}
 
 		/**
+		 * Determine whether tree is full.
+		 *
+		 * @post Function value = (tree is full).
 		 * @return True if the free store has no room for another node and false otherwise.
 		 */
 		bool isFull() const
@@ -295,6 +306,17 @@ namespace Tweak
 			printTree(root, outFile);
 		}
 
+		/**
+		 * Retrieves item whose key matches item's key (if present).
+		 *
+		 * @pre Key member of item is initialized.
+		 * @post If there is a element someItem whose key matches item's key,
+		 * then found = true and item is a copy of someItem; otherwise, found
+		 * = false and item is unchanged. Tree is unchanged.
+		 *
+		 * @param item
+		 * @param found
+		 */
 		void retrieveItem(ItemType& item, bool& found) const
 		{
 			retrieve(root, item, found);
@@ -329,6 +351,11 @@ namespace Tweak
 			}
 		}
 
+		/**
+		 * Determines the number of elements in tree.
+		 *
+		 * @post Function value = number of elements in tree.
+		 */
 		std::size_t lengthIs() const
 		{
 			return countNodes(root);
