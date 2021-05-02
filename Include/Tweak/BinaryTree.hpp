@@ -21,6 +21,48 @@ namespace Tweak
 
 	private:
 
+		// Property
+
+		TreeNode<ItemType>* root {nullptr};
+
+		QueType preQue;
+
+		QueType inQue;
+
+		QueType postQue;
+
+		// Methods
+
+		void preOrder(TreeNode<ItemType>* tree, QueType& preQueue)
+		{
+			if (tree not_eq nullptr)
+			{
+				preQue.enqueue(tree->info);
+				preOrder(tree->left, preQue);
+				preOrder(tree->right, preQue);
+			}
+		}
+
+		void inOrder(TreeNode<ItemType>* tree, QueType& inQueue)
+		{
+			if (tree not_eq nullptr)
+			{
+				inOrder(tree->left, inQue);
+				inQue.enqueue(tree->info);
+				inOrder(tree->right, inQue);
+			}
+		}
+
+		void postOrder(TreeNode<ItemType>* tree, QueType& postQueue)
+		{
+			if (tree not_eq nullptr)
+			{
+				postOrder(tree->left, postQue);
+				postOrder(tree->right, postQue);
+				postQue.enqueue(tree->info);
+			}
+		}
+
 		void insert(TreeNode<ItemType>*& tree, ItemType item)
 		{
 			if (tree == nullptr)
@@ -163,10 +205,6 @@ namespace Tweak
 
 	public:
 
-		// Property
-
-		TreeNode<ItemType>* root {nullptr};
-
 		// Constructor
 
 		TreeNode() = default;
@@ -236,7 +274,21 @@ namespace Tweak
 			deleteItem(root, item);
 		}
 
-		void resetTree(OrderType order);
+		void resetTree(OrderType order)
+		{
+			switch(order)
+			{
+			case OrderType::PreOrder:
+				preOrder(root, preQue);
+				break;
+			case OrderType::InOrder:
+				inOrder(root, inQue);
+				break;
+			case OrderType::PostOrder:
+				postOrder(root, postQue);
+				break;
+			}
+		}
 
 		void print(std::ofstream& outFile) const
 		{
