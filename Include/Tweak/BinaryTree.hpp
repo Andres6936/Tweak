@@ -121,6 +121,16 @@ namespace Tweak
 			}
 		}
 
+		void destroy(TreeNode<ItemType>*& tree)
+		{
+			if (tree not_eq nullptr)
+			{
+				destroy(tree->left);
+				destroy(tree->right);
+				delete tree;
+			}
+		}
+
 		/**
 		 * @return The number of nodes in the tree.
 		 */
@@ -150,7 +160,10 @@ namespace Tweak
 
 		// Destructor
 
-		~TreeType();
+		virtual ~TreeType()
+		{
+			destroy(root);
+		}
 
 		// Operators
 
