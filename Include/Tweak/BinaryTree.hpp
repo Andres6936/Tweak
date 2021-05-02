@@ -74,7 +74,7 @@ namespace Tweak
 				tree->left = nullptr;
 				tree->info = item;
 			}
-			else if (item < item->info)
+			else if (item < tree->info)
 			{
 				insert(tree->left, item);
 			}
