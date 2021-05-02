@@ -14,6 +14,8 @@ TEST_CASE("Binary Tree")
 	CHECK(binaryTree.isEmpty());
 	CHECK(not binaryTree.isFull());
 
+	CHECK(binaryTree.lengthIs() == 0);
+
 	binaryTree.insertItem('D');
 	binaryTree.insertItem('B');
 	binaryTree.insertItem('A');
@@ -24,4 +26,6 @@ TEST_CASE("Binary Tree")
 
 	CHECK(not binaryTree.isEmpty());
 	CHECK(not binaryTree.isFull());
+
+	CHECK(binaryTree.lengthIs() == 7);
 }
