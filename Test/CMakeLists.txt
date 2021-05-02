@@ -17,3 +17,4 @@ MACRO(ADD_TWEAK_TEST _NAME_TARGET _NAME_FILE)
 ENDMACRO()
 
 ADD_TWEAK_TEST(Test.Unit.BinaryTree Unit/TestBinaryTree.cpp)
+ADD_TWEAK_TEST(Test.Unit.QueType Unit/TestQueType.cpp)
