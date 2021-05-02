@@ -13,4 +13,12 @@ TEST_CASE("Queue Type")
 
 	CHECK(queueChar.isEmpty());
 	CHECK(not queueChar.isFull());
+
+	queueChar.enqueue('A');
+	queueChar.enqueue('B');
+	queueChar.enqueue('C');
+	queueChar.enqueue('D');
+
+	CHECK(not queueChar.isEmpty());
+	CHECK(not queueChar.isFull());
 }
