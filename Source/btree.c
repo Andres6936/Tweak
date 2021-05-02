@@ -83,7 +83,7 @@ typedef nodecomponent* nodeptr;
  * define node_addr for the in-memory case as being a struct
  * containing only a nodeptr.
  * 
- * This unfortunately needs to go in btree.h so that clients
+ * This unfortunately needs to go in BinaryTree.h so that clients
  * writing user properties can know about the nodecomponent
  * structure.
  */
@@ -121,7 +121,7 @@ static const node_addr NODE_ADDR_NULL = { NULL };
  *  - one reference count.
  */
 
-struct btree
+struct BinaryTree
 {
 	int mindegree;               /* min number of subtrees */
 	int maxdegree;               /* max number of subtrees */
@@ -2126,7 +2126,7 @@ void error(char *fmt, ...) {
 /*
  * See if a tree has a 2-element root node.
  */
-static int bt_tworoot(btree *bt)
+static int bt_tworoot(BinaryTree *bt)
 {
 	nodeptr n;
 	int i;
@@ -2145,7 +2145,7 @@ static int bt_tworoot(btree *bt)
  * the admin section above.)
  */
 
-static nodeptr bt_copy_node(btree *bt, nodeptr n)
+static nodeptr bt_copy_node(BinaryTree *bt, nodeptr n)
 {
 	int i, children;
 	nodeptr ret;
@@ -2175,10 +2175,10 @@ static nodeptr bt_copy_node(btree *bt, nodeptr n)
 	return ret;
 }
 
-btree *bt_copy(btree *bt)
+BinaryTree *bt_copy(BinaryTree *bt)
 {
 	nodeptr n;
-	btree *bt2;
+	BinaryTree *bt2;
 
 	bt2 = bt_new(bt->cmp, bt->copy, bt->freeelt, bt->propsize, bt->propalign,
 		 bt->propmake, bt->propmerge, bt->userstate, bt->mindegree);
@@ -2196,7 +2196,7 @@ btree *bt_copy(btree *bt)
  * This function is intended to be called from gdb when debugging
  * things.
  */
-void bt_dump_nodes(btree *bt, ...)
+void bt_dump_nodes(BinaryTree *bt, ...)
 {
 	int i, children;
 	va_list ap;
@@ -2232,7 +2232,7 @@ void bt_dump_nodes(btree *bt, ...)
  *    assuming the array is correctly constructed.)
  */
 
-void verifynode(btree *bt, nodeptr n, ItemType *array, int *arraypos,
+void verifynode(BinaryTree *bt, nodeptr n, ItemType *array, int *arraypos,
 		int depth)
 {
 	int subtrees, min, max, i, before, after, count;
@@ -2314,7 +2314,7 @@ void verifynode(btree *bt, nodeptr n, ItemType *array, int *arraypos,
 	}
 }
 
-void verifytree(btree *bt, ItemType *array, int arraylen)
+void verifytree(BinaryTree *bt, ItemType *array, int arraylen)
 {
 	nodeptr n;
 	int i = 0;
@@ -2451,7 +2451,7 @@ char *strings[] = {
 
 #define NSTR lenof(strings)
 
-void findtest(btree *tree, ItemType *array, int arraylen)
+void findtest(BinaryTree *tree, ItemType *array, int arraylen)
 {
 	static const int rels[] = {
 	BT_REL_EQ, BT_REL_GE, BT_REL_LE, BT_REL_LT, BT_REL_GT
@@ -2540,10 +2540,10 @@ void findtest(btree *tree, ItemType *array, int arraylen)
 	}
 }
 
-void splittest(btree *tree, ItemType *array, int arraylen)
+void splittest(BinaryTree *tree, ItemType *array, int arraylen)
 {
 	int i;
-	btree *tree3, *tree4;
+	BinaryTree *tree3, *tree4;
 	for (i = 0; i <= arraylen; i++) {
 	printf("splittest: %d\n", i);
 	tree3 = BT_COPY(tree);
@@ -2636,7 +2636,7 @@ int main(void) {
 	ItemType *array;
 	int arraylen;
 	ItemType ret, ret2, item;
-	btree *tree, *tree2, *tree3, *tree4;
+	BinaryTree *tree, *tree2, *tree3, *tree4;
 
 	setvbuf(stdout, NULL, _IOLBF, 0);
 	setvbuf(stderr, NULL, _IOLBF, 0);

@@ -26,7 +26,7 @@ PREFIX=$(DESTDIR)/usr/local
 BINDIR=$(PREFIX)/bin
 MANDIR=$(PREFIX)/man/man1
 
-TWEAK := main.o keytab.o actions.o search.o rcfile.o buffer.o btree.o
+TWEAK := main.o keytab.o actions.o search.o rcfile.o buffer.o BinaryTree.o
 
 ifeq ($(SLANG),yes)
 # INCLUDE += -I/path/to/slang/include
@@ -41,7 +41,7 @@ endif
 .c.o:
 	$(CC) $(CFLAGS) $*.c
 
-all: tweak tweak.1 btree.html
+all: tweak tweak.1 BinaryTree.html
 
 tweak:	$(TWEAK)
 	$(LINK) -o tweak $(TWEAK) $(LIBS)
@@ -49,14 +49,14 @@ tweak:	$(TWEAK)
 tweak.1:  manpage.but
 	halibut --man=$@ $<
 
-btree.html:  btree.but
+BinaryTree.html:  BinaryTree.but
 	halibut --html=$@ $<
 
 # Ensure tweak.h reflects this version number, and then run a
 # command like `make release VERSION=3.00'.
-release: tweak.1 btree.html
+release: tweak.1 BinaryTree.html
 	mkdir -p reltmp/tweak-$(VERSION)
-	for i in LICENCE *.c *.h *.but tweak.1 btree.html Makefile; do   \
+	for i in LICENCE *.c *.h *.but tweak.1 BinaryTree.html Makefile; do   \
 		ln -s ../../$$i reltmp/tweak-$(VERSION);         \
 	done
 	(cd reltmp; tar chzvf ../tweak-$(VERSION).tar.gz tweak-$(VERSION))
@@ -69,7 +69,7 @@ install: tweak tweak.1
 	install -m 0644 tweak.1 $(MANDIR)/tweak.1
 
 clean:
-	rm -f *.o tweak tweak.1 btree.html
+	rm -f *.o tweak tweak.1 BinaryTree.html
 
 .PHONY: release clean install
 
@@ -78,7 +78,7 @@ keytab.o: keytab.c tweak.h
 actions.o: actions.c tweak.h
 search.o: search.c tweak.h
 rcfile.o: rcfile.c tweak.h
-buffer.o: buffer.c tweak.h btree.h
+buffer.o: buffer.c tweak.h BinaryTree.h
 slang.o: slang.c tweak.h
 curses.o: curses.c tweak.h
-btree.o: btree.c btree.h
+BinaryTree.o: BinaryTree.c BinaryTree.h
