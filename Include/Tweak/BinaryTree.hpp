@@ -300,7 +300,34 @@ namespace Tweak
 			retrieve(root, item, found);
 		}
 
-		void getNextItem(ItemType& item, OrderType order, bool& finished);
+		void getNextItem(ItemType& item, OrderType order, bool& finished)
+		{
+			finished = false;
+			switch(order)
+			{
+			case OrderType::PreOrder:
+				preQue.dequeue(item);
+				if (preQue.isEmpty())
+				{
+					finished = true;
+				}
+				break;
+			case OrderType::InOrder:
+				inQue.dequeue(item);
+				if (inQue.isEmpty())
+				{
+					finished = true;
+				}
+				break;
+			case OrderType::PostOrder:
+				postQue.dequeue(item);
+				if (postQue.isEmpty())
+				{
+					finished = true;
+				}
+				break;
+			}
+		}
 
 		std::size_t lengthIs() const
 		{
