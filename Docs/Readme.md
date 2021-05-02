@@ -1,0 +1,1 @@
+See the article: [An Efficient Data Structure For A Hex Editor](https://htmlpreview.github.io/?https://github.com/Andres6936/Tweak/blob/master/Docs/index.html)
